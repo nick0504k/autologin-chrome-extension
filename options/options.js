@@ -674,6 +674,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       panel.innerHTML = `
         <div class="card">
+          <section class="panel-section">
+            <h4 class="panel-section-title">🖥️ 서버 <span>어느 주소를, 어느 그룹에서</span></h4>
           <div class="form-row">
             <label for="${grp}-serverTab">소속 탭</label>
             <div class="tab-move-row">
@@ -699,9 +701,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <!-- Server Details Form -->
           <div class="card-header">
             <div class="card-header-left">
-              <label for="${grp}-name" style="font-size:12px; font-weight:700; color:#64748b;">서버 이름:</label>
+              <label for="${grp}-name" style="font-size:12px; font-weight:700; color:#64748b; white-space:nowrap;">서버 이름</label>
               <input type="text" class="card-name-input" id="${grp}-name" value="${escapeHtml(curServer.name || '')}" placeholder="예: 운영 서버" spellcheck="false">
-              <a href="${escapeHtml(AwaServerUrl.url(curServer) || '#')}" target="_blank" class="card-link" id="${grp}-link" title="새 탭으로 열기">↗ 열기</a>
+              <a href="${escapeHtml(AwaServerUrl.url(curServer) || '#')}" target="_blank" class="card-link" id="${grp}-link" title="새 탭으로 열기" style="white-space:nowrap;">↗ 열기</a>
             </div>
             <div class="card-header-right">
               <label class="switch-inline">
@@ -715,7 +717,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <label for="${grp}-host">접속 주소 (한 줄에 하나 · 첫 줄이 기본 주소, 경로·쿼리까지 저장됩니다)</label>
             <div class="host-row">
               <textarea id="${grp}-host" rows="${Math.max(1, AwaServerUrl.addressText(curServer).split('\n').length)}" placeholder="https://example.internal&#10;로그인이 여러 주소에 걸쳐 있으면 줄을 추가하세요" spellcheck="false">${escapeHtml(AwaServerUrl.addressText(curServer))}</textarea>
-              <button type="button" class="btn secondary btn-detect-server" data-group="${grp}">🔍 자동 감지</button>
+              ${AwaDefaultServers.SUPERAPP_LIST_PATH ? `<button type="button" class="btn secondary btn-detect-server" data-group="${grp}" title="이 주소가 어느 서버인지 API 응답으로 확인합니다">🔍 자동 감지</button>` : ''}
             </div>
           </div>
 
@@ -756,6 +758,33 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>`;
           })()}
 
+          ${AwaServerTypes.inDeployment(curServer) ? `
+          <div class="form-row">
+            <label for="${grp}-serverEnv">서버 환경 (실제 배포 환경)</label>
+            <select id="${grp}-serverEnv">
+              ${AwaEnvStore.ENVIRONMENTS.map((e) => `<option value="${e}" ${AwaEnvStore.envOf(curServer, activeKey) === e ? 'selected' : ''}>${e}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="${grp}-bank">은행 (참가기관)</label>
+            <select id="${grp}-bank">
+              <option value="" ${AwaServerTypes.bankOf(curServer) ? '' : 'selected'}>(지정 안 함)</option>
+              ${AwaServerTypes.BANKS.map((bank) => `<option value="${bank}" ${AwaServerTypes.bankOf(curServer) === bank ? 'selected' : ''}>${bank}</option>`).join('')}
+            </select>
+          </div>` : ''}
+
+          <div class="form-row">
+            <label for="${grp}-serverType">서버 유형</label>
+            <select id="${grp}-serverType">
+              ${AwaServerTypes.TYPES.map((t) => `<option value="${t.id}" ${AwaServerTypes.of(curServer) === t.id ? 'selected' : ''}>${escapeHtml(t.label)}</option>`).join('')}
+            </select>
+          </div>
+
+          </section>
+
+          <section class="panel-section">
+            <h4 class="panel-section-title">👤 계정 <span>무엇으로 로그인하는지</span></h4>
           <!-- A mobile server logs in as a super app customer, not an account ID -->
           ${AwaAccounts.isMobile(curServer) ? `
           <div class="form-row">
@@ -799,29 +828,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-          ${AwaServerTypes.inDeployment(curServer) ? `
-          <div class="form-row">
-            <label for="${grp}-serverEnv">서버 환경 (실제 배포 환경)</label>
-            <select id="${grp}-serverEnv">
-              ${AwaEnvStore.ENVIRONMENTS.map((e) => `<option value="${e}" ${AwaEnvStore.envOf(curServer, activeKey) === e ? 'selected' : ''}>${e}</option>`).join('')}
-            </select>
-          </div>
+          </section>
 
-          <div class="form-row">
-            <label for="${grp}-bank">은행 (참가기관)</label>
-            <select id="${grp}-bank">
-              <option value="" ${AwaServerTypes.bankOf(curServer) ? '' : 'selected'}>(지정 안 함)</option>
-              ${AwaServerTypes.BANKS.map((bank) => `<option value="${bank}" ${AwaServerTypes.bankOf(curServer) === bank ? 'selected' : ''}>${bank}</option>`).join('')}
-            </select>
-          </div>` : ''}
-
-          <div class="form-row">
-            <label for="${grp}-serverType">서버 유형</label>
-            <select id="${grp}-serverType">
-              ${AwaServerTypes.TYPES.map((t) => `<option value="${t.id}" ${AwaServerTypes.of(curServer) === t.id ? 'selected' : ''}>${escapeHtml(t.label)}</option>`).join('')}
-            </select>
-          </div>
-
+          <section class="panel-section">
+            <h4 class="panel-section-title">🔑 로그인 방식 <span>어떻게 입력하고 인증하는지</span></h4>
           <div class="form-row">
             <label for="${grp}-keypadMode">비밀번호 입력 방식 (가상 키보드 선택)</label>
             <select id="${grp}-keypadMode">
@@ -841,6 +851,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
             </div>
           </div>
+          </section>
         </div>
       `;
 
@@ -1566,9 +1577,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   btnResetAll.addEventListener('click', async () => {
-    if (!confirm('모든 탭과 서버 설정을 초기 기본값으로 되돌립니다.\n직접 추가한 서버와 탭은 모두 사라집니다. 계속하시겠습니까?')) return;
+    if (!confirm('서버 목록과 전역 설정을 배포 기본값으로 되돌립니다.\n직접 추가한 서버와 그룹은 사라집니다.\n\n녹화한 E2E 시나리오와 허용한 사이트 권한은 그대로 둡니다 — 그것까지 지우려면 전체 데이터 삭제(Format)를 쓰세요.\n\n계속하시겠습니까?')) return;
 
     environments = AwaEnvStore.build({}, DEFAULT_SERVERS);
+    groupOrder = [];
     const [firstKey, firstServer] = Object.entries(environments)[0] || [];
     setSpeedValue(DEFAULT_GLOBAL.keyDelay);
     document.getElementById('autoSubmit').checked = DEFAULT_GLOBAL.autoSubmit;
@@ -1577,6 +1589,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       global: DEFAULT_GLOBAL,
       keyDelay: DEFAULT_GLOBAL.keyDelay,
       autoSubmit: DEFAULT_GLOBAL.autoSubmit,
+      groupOrder: [],
       activeGroup: firstServer?.group || '',
       activeServerKey: firstKey || '',
     });

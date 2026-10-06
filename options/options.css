@@ -182,6 +182,15 @@ h1 {
   padding: 0;
 }
 
+/* The box already is the frame. The panel inside it drawing a second one just puts
+   a line next to a line. */
+.servers-box .card {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
 .tab-btn.section {
   color: #475569;
   background-color: #f1f5f9;
@@ -967,4 +976,40 @@ select:focus {
 @keyframes focus-flash-fade {
   0%, 60% { background: #fffbeb; }
   100% { background: transparent; outline-color: transparent; }
+}
+
+/* The server form is three questions, not one list: which address, which account,
+   and how the login is typed. Saying so costs a heading each and saves reading the
+   whole form to find one field. */
+.panel-section {
+  padding: 2px 0 4px;
+}
+
+.panel-section + .panel-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.panel-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.panel-section-title span {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* The settings page's own cards read the same way. */
+.card h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }

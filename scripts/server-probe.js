@@ -5,6 +5,10 @@
   'use strict';
 
   async function readList(server, { signal } = {}) {
+    // Identification is one unauthenticated call to an endpoint this build was told
+    // about. A build that was told of none must not go POSTing at the root of
+    // whatever address someone configured.
+    if (!AwaSuperAppUsers.LIST_PATH) return { reachable: false, error: 'no identify endpoint' };
     let response;
     try {
       response = await fetch(AwaServerUrl.url(server, AwaSuperAppUsers.LIST_PATH), {
