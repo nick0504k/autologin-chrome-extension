@@ -1417,6 +1417,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       version: chrome.runtime.getManifest().version,
       exportedAt: new Date().toISOString(),
       environments: AwaEnvStore.toStorage(environments, DEFAULT_SERVERS),
+      // The arrangement of the tab bar is a setting too: it was dragged into that
+      // order on purpose, and an import without it starts over.
+      groupOrder,
       global: {
         autoSubmit: document.getElementById('autoSubmit').checked,
         keyDelay: parseInt(keyDelayInput.value, 10) || DEFAULT_GLOBAL.keyDelay,
@@ -1458,6 +1461,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       environments = AwaEnvStore.build({ ...AwaEnvStore.toStorage(environments, DEFAULT_SERVERS), ...incoming }, DEFAULT_SERVERS);
       const payload = { environments: AwaEnvStore.toStorage(environments, DEFAULT_SERVERS) };
       if (parsed?.global && typeof parsed.global === 'object') payload.global = parsed.global;
+      if (Array.isArray(parsed?.groupOrder)) {
+        // Groups this install has but the file does not keep the places they had.
+        const incomingOrder = parsed.groupOrder.filter((group) => typeof group === 'string');
+        payload.groupOrder = [...incomingOrder, ...groupOrder.filter((group) => !incomingOrder.includes(group))];
+      }
       await chrome.storage.local.set(payload);
       result.textContent = `✓ 서버 ${count}개를 가져왔습니다. 새 주소는 아래에서 접근을 허용해 주세요.`;
       location.reload();
@@ -1478,20 +1486,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function renderPermissionState() {
+    const section = document.getElementById('permission-section');
     const stateEl = document.getElementById('permission-state');
     const button = document.getElementById('btn-grant-permissions');
     if (!stateEl || !button) return;
-    const { origins, missing } = await missingOrigins();
-    if (!origins.length) {
-      stateEl.textContent = '설정된 서버가 없습니다.';
-      button.style.display = 'none';
-      return;
-    }
-    if (!missing.length) {
-      stateEl.textContent = `✓ 설정된 주소 ${origins.length}곳 모두 허용되어 있습니다.`;
-      button.style.display = 'none';
-      return;
-    }
+    const { missing } = await missingOrigins();
+    // Nothing to allow is nothing to say. A build whose origins are in its manifest
+    // is in that state permanently, and this section would be a paragraph about a
+    // button that can never do anything.
+    if (section) section.style.display = missing.length ? '' : 'none';
+    if (!missing.length) return;
     stateEl.textContent = `허용이 필요한 주소 ${missing.length}곳: ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? ' 외' : ''}`;
     button.style.display = '';
   }

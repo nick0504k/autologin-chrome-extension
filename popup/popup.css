@@ -1404,14 +1404,12 @@ input:checked + .slider:before {
   background: #eff6ff;
 }
 
-/* The account controls, sitting under the server row they belong to. Inside the
-   list's card they are not a card of their own — the indent and the line down the
-   side are what say they belong to the row above. */
+/* The account controls, under the server row they belong to: no frame, no indent —
+   the row above is already the heading, and the list has its own card. */
 .server-switch-list .inline-under-row {
-  margin: 2px 0 10px 10px;
-  padding: 8px 0 2px 12px;
+  margin: 0 0 8px;
+  padding: 6px 0 2px;
   border: none;
-  border-left: 2px solid #bfdbfe;
   border-radius: 0;
   background: transparent;
   box-shadow: none;

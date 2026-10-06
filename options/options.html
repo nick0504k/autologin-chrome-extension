@@ -58,7 +58,9 @@
 
         </section>
 
-        <section class="panel-section">
+        <!-- Shown only while some configured address has not been allowed: a build
+             that ships its origins has nothing to ask for here, ever. -->
+        <section class="panel-section" id="permission-section" style="display: none;">
           <h4 class="panel-section-title">🔐 사이트 접근 권한 <span>어느 주소에서 동작할지</span></h4>
           <div class="form-row">
             <p class="field-hint">확장 프로그램은 <strong>설정된 서버 주소에만</strong> 접근합니다.
