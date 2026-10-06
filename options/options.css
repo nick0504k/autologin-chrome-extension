@@ -1048,3 +1048,11 @@ select:focus {
   font-weight: 500;
   color: #94a3b8;
 }
+
+/* Why a server in a shared-address list is the one in force. */
+.duplicate-host-why {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b45309;
+}

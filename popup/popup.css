@@ -1339,3 +1339,13 @@ input:checked + .slider:before {
 .btn-row-priority.is-primary {
   color: #f59e0b;
 }
+
+/* The status line while it is saying what just happened, rather than resting. */
+.server-switch-hint.is-notice {
+  color: #1d4ed8;
+  font-weight: 700;
+  background: #eff6ff;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin: 8px 0 6px;
+}

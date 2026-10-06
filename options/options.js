@@ -30,10 +30,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     'autoSubmit',
     'activeGroup',
     'groupOrder',
-    'aiConfig'
+    'aiConfig',
+    // Which server an address was probed as, and whether that probe is being
+    // honoured. The popup ranks a shared address by these; this page showed the
+    // tick alone, so the two disagreed about which server a page there logs in as.
+    'detectedOwners',
+    'detectionOff'
   ]);
 
   let environments = AwaEnvStore.build(stored.environments, DEFAULT_SERVERS);
+  let detectedOwners = stored.detectedOwners || {};
+  let detectionOff = stored.detectionOff || {};
+  const detection = () => ({ detected: detectedOwners, detectionOff });
 
   const resolvedDelay = Number(stored.global?.keyDelay ?? stored.keyDelay ?? DEFAULT_GLOBAL.keyDelay);
   document.getElementById('updateFeedUrl').value = AwaUpdates.config(stored).feedUrl;
@@ -738,16 +746,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!duplicates.length) return '';
 
             const blocks = duplicates.map(([url, keys], index) => {
-              const winner = AwaServerUrl.matchHost(environments, url);
+              // Ranked the way the popup and the content script rank it: what the
+              // address was probed as outranks what was ticked for it, unless that
+              // probe was switched off.
+              const winner = AwaServerUrl.matchHost(environments, url, detection());
+              const ticked = keys.find((k) => environments[k]?.primary);
+              const probed = detectedOwners[AwaServerUrl.normalizeHost(url)];
+              const probeWins = !!probed && probed !== ticked && !detectionOff[AwaServerUrl.normalizeHost(url)];
               const rows = keys.map((k) => {
                 const server = environments[k];
                 const here = k === activeKey ? ' <strong>(현재)</strong>' : '';
+                const why = k === probed && probeWins ? ' <em class="duplicate-host-why">· 접속해 보니 이 서버</em>' : '';
                 return `<li><label class="duplicate-host-pick">
                   <input type="radio" name="${grp}-primary-${index}" value="${escapeHtml(k)}" ${k === winner ? 'checked' : ''}>
-                  <span>${escapeHtml(server.group || '')} / ${escapeHtml(server.name || k)}${here}</span>
+                  <span>${escapeHtml(server.group || '')} / ${escapeHtml(server.name || k)}${here}${why}</span>
                 </label></li>`;
               }).join('');
-              return `<p class="duplicate-host-url">${escapeHtml(url)}</p><ul class="duplicate-host-list">${rows}</ul>`;
+              const note = probeWins
+                ? `<p class="duplicate-host-note">이 주소는 접속 결과로 확인된 서버가 먼저 적용됩니다. 체크를 바꿔도 그 결과가 우선입니다 — 팝업의 📍를 눌러 감지를 끄면 체크한 서버를 씁니다.</p>`
+                : '';
+              return `<p class="duplicate-host-url">${escapeHtml(url)}</p><ul class="duplicate-host-list">${rows}</ul>${note}`;
             }).join('');
 
             return `

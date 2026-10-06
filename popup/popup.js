@@ -268,7 +268,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         state.textContent = toggle.checked ? '' : 'OFF';
         await persistConfig();
         syncForm();
-        showIndicator(serverSaveIndicator);
+        announce(toggle.checked
+          ? `'${AwaServerTypes.label(server, key)}' 자동 로그인 켜짐 — 이 서버에서 자동 입력합니다.`
+          : `'${AwaServerTypes.label(server, key)}' 자동 로그인 꺼짐 — 이 서버에서는 입력하지 않습니다.`);
       });
       const slider = document.createElement('span');
       slider.className = 'slider';
@@ -279,7 +281,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const sharing = AwaServerUrl.matchingKeys(environments, server);
       let priority = null;
       if (sharing.length > 1) {
-        const winner = AwaServerUrl.matchHost(environments, server);
+        // Ranked the way the content script ranks it — what the address was probed
+        // as outranks what was ticked — so the star, the 📍 beside it and the
+        // settings page all name the same server.
+        const winner = AwaServerUrl.matchHost(environments, server, { detected: detectedOwners, detectionOff });
+        const probed = detectedOwners[AwaServerUrl.normalizeHost(server)];
+        const probeWins = !!probed && !detectionOff[AwaServerUrl.normalizeHost(server)] && probed !== sharing.find((k) => environments[k]?.primary);
         priority = document.createElement('button');
         priority.type = 'button';
         priority.className = `btn-row-priority${winner === key ? ' is-primary' : ''}`;
@@ -288,8 +295,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isWinner = winner === key;
         priority.textContent = isWinner ? '★' : '☆';
         priority.title = isWinner
-          ? `이 주소(${AwaServerUrl.origin(server)})는 지금 이 서버로 로그인합니다 — 공유하는 서버 ${sharing.length}개`
-          : `이 주소(${AwaServerUrl.origin(server)})를 이 서버로 로그인하도록 지정 — 공유하는 서버 ${sharing.length}개`;
+          ? `이 주소(${AwaServerUrl.origin(server)})는 지금 이 서버로 로그인합니다${probeWins ? ' (접속해 보니 이 서버 — 체크보다 우선)' : ''} — 공유하는 서버 ${sharing.length}개`
+          : `이 주소(${AwaServerUrl.origin(server)})를 이 서버로 로그인하도록 지정${probeWins ? ' (단, 접속 결과가 우선이라 📍를 꺼야 적용됩니다)' : ''} — 공유하는 서버 ${sharing.length}개`;
         priority.setAttribute('aria-label', priority.title);
         priority.setAttribute('aria-pressed', String(winner === key));
         priority.addEventListener('click', async () => {
@@ -297,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           environments[key].primary = true;
           await persistConfig();
           renderServerSwitches();
-          showIndicator(serverSaveIndicator);
+          announce(`${AwaServerUrl.origin(server)} 주소는 이제 '${AwaServerTypes.label(server, key)}'로 로그인합니다.`);
         });
       }
       const open = document.createElement('button');
@@ -333,6 +340,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   makeDragScrollable(envTabsContainer);
+
+  // What a switch just did, in words, where the resting hint already is. "✓ 전환됨"
+  // said that something had been saved, not what it now does.
+  let noticeTimer = null;
+
+  function restingStatus() {
+    return masterEnabled
+      ? '서버별로 켜고 끌 수 있습니다 · 끈 뒤 ↗로 접속하세요.'
+      : '전체 자동 로그인 꺼짐 — 서버별 설정은 그대로 있습니다.';
+  }
+
+  function announce(message) {
+    const status = document.getElementById('master-status');
+    if (!status) return;
+    status.textContent = message;
+    status.classList.add('is-notice');
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => {
+      status.classList.remove('is-notice');
+      status.textContent = restingStatus();
+    }, 3200);
+  }
 
   function showIndicator(el) {
     if (!el) return;
@@ -653,9 +682,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? '전체 자동 로그인: 켜짐 — 끄려면 클릭'
         : '전체 자동 로그인: 꺼짐 — 켜려면 클릭';
     }
-    document.getElementById('master-status').textContent = masterEnabled
-      ? '서버별 자동 로그인 · OFF로 끈 뒤 ↗로 접속하세요.'
-      : '전체 자동 로그인 OFF · 서버별 설정은 유지됩니다.';
+    const status = document.getElementById('master-status');
+    if (status && !status.classList.contains('is-notice')) status.textContent = restingStatus();
     btnTrigger.disabled = !masterEnabled || cur.enabled === false;
     popupUserSelect.innerHTML = renderAccountOptions(cur.accounts, cur.username);
     syncAccountPassword();
@@ -685,6 +713,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     masterEnabled = toggleEnabled.checked;
     await persistConfig();
     syncForm();
+    announce(masterEnabled
+      ? '전체 자동 로그인 켜짐 — 켜 둔 서버에서 자동 입력합니다.'
+      : '전체 자동 로그인 꺼짐 — 어떤 서버에서도 입력하지 않습니다.');
   });
 
   // Account Swap selection
