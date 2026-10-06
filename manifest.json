@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "자동 로그인 & E2E 테스트",
+  "name": "자동 로그인 & 동작 녹화",
   "version": "1.6.0",
   "description": "설정한 서버에 자동 로그인하고 저장한 플로우를 원클릭으로 실행합니다 (가상 키패드 및 OTP 지원)",
   "permissions": [
@@ -29,7 +29,7 @@
   ],
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "자동 로그인 & E2E 테스트",
+    "default_title": "자동 로그인 & 동작 녹화",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

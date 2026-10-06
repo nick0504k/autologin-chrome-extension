@@ -1056,3 +1056,38 @@ select:focus {
   font-weight: 700;
   color: #b45309;
 }
+
+/* Everything that can be pressed answers the pointer. */
+select:hover {
+  border-color: #94a3b8;
+}
+
+.tab-btn.active:hover,
+.tab-btn.section.active:hover {
+  background-color: #dbeafe;
+}
+
+.servers-box-header .tab-btn.active:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Inside the chosen chip these were painted over by the chip's own rule, which
+   outranked their hover and left them looking inert. */
+.servers-box-header .tab-btn.active .btn-tab-rename:hover {
+  background: #ffffff;
+  color: #2563eb;
+}
+
+.servers-box-header .tab-btn.active .btn-tab-close:hover {
+  background: #ffffff;
+  color: #dc2626;
+}
+
+/* These carried their border inline, where no hover rule could reach it. */
+.options-user-select,
+.options-server-select,
+.step-server-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}

@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       savedTestsListContainer.innerHTML = `
         <div style="text-align: center; padding: 24px; color: #94a3b8; font-size: 13px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1;">
           ${filterVal === 'all'
-            ? '저장된 E2E 테스트 시나리오가 없습니다.<br>확장 프로그램 팝업의 [🎬 동작 녹화] 탭에서 [동작 기록 시작]을 통해 손쉽게 시나리오를 생성할 수 있습니다.'
+            ? '저장된 동작 시나리오가 없습니다.<br>확장 프로그램 팝업의 [🎬 동작 녹화] 탭에서 [동작 기록 시작]을 통해 손쉽게 시나리오를 생성할 수 있습니다.'
             : '선택된 서버 환경에 매칭된 시나리오가 없습니다.<br><span style="color: #64748b; font-size: 11px;">(상단 필터를 \'🌐 모든 서버 시나리오\'로 변경하거나 새 시나리오를 녹화해보세요)</span>'}
         </div>
       `;
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="step-editor-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #475569;">
                   <span>매칭 서버:</span>
-                  <select class="step-server-select" id="step-server-select-${escapeHtml(t.id)}" style="font-size: 11px; padding: 3px 6px; border-radius: 5px; border: 1px solid #cbd5e1; background: #fff;">
+                  <select class="step-server-select" id="step-server-select-${escapeHtml(t.id)}" style="font-size: 11px; padding: 3px 6px; border-radius: 5px; background: #fff;">
                     <option value="">[공통] 모든 서버</option>
                     ${Object.entries(environments).map(([k, s]) => `
                       <option value="${escapeHtml(k)}" ${t.serverKey === k ? 'selected' : ''}>[${escapeHtml(s.group)}] ${escapeHtml(s.name)} (${escapeHtml(s.host)})</option>
@@ -812,7 +812,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <input type="text" id="${grp}-superappUrl" class="superapp-url-input" value="${escapeHtml(AwaSuperAppUsers.listUrl(curServer))}" placeholder="${escapeHtml(AwaSuperAppUsers.LIST_PATH)}" spellcheck="false" autocomplete="off" title="사용자 목록을 조회하는 주소 — 경로만 입력하면 접속 주소에 붙습니다">
             <input type="text" id="${grp}-superappSearch" placeholder="이름 / 고객번호 / 계좌번호로 검색" spellcheck="false" autocomplete="off" style="margin-bottom: 6px;">
-            <select id="${grp}-superappSelect" class="options-user-select" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; background: #ffffff;">
+            <select id="${grp}-superappSelect" class="options-user-select" style="width: 100%; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; background: #ffffff;">
               <option value="">(목록을 불러오는 중...)</option>
             </select>
           </div>
@@ -823,7 +823,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <button type="button" class="btn-text-action btn-add-user-toggle" data-group="${grp}">+ 새 ID 추가</button>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <select id="${grp}-userSelect" class="options-user-select" style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; background: #ffffff;">
+              <select id="${grp}-userSelect" class="options-user-select" style="flex: 1; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; outline: none; background: #ffffff;">
                 ${renderAccountOptions(curServer.accounts, curServer.username)}
               </select>
               <button type="button" class="btn-icon-del btn-delete-user" id="${grp}-btn-del-user" data-group="${grp}" title="선택된 ID 삭제" style="display: ${curServer.accounts && curServer.accounts.length > 1 ? 'flex' : 'none'};">✕</button>
@@ -831,7 +831,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <!-- Inline Add ID box -->
             <div id="${grp}-add-user-box" class="account-add-inline" style="display: none;">
-              <input type="text" id="${grp}-new-username" placeholder="새 계정 ID 입력" style="flex: 1; padding: 7px 10px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none;" spellcheck="false" autocomplete="off">
+              <input type="text" id="${grp}-new-username" placeholder="새 계정 ID 입력" style="flex: 1; padding: 7px 10px; font-size: 13px; border-radius: 6px; outline: none;" spellcheck="false" autocomplete="off">
               <button type="button" class="btn primary btn-confirm-add-user" data-group="${grp}" style="padding: 6px 14px; font-size: 12px;">추가</button>
               <button type="button" class="btn secondary btn-cancel-add-user" data-group="${grp}" style="padding: 6px 12px; font-size: 12px;">취소</button>
             </div>
@@ -906,7 +906,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     aiBtn.type = 'button';
     aiBtn.className = `tab-btn section ${activeTabId === 'tab-ai' ? 'active' : ''}`;
     aiBtn.dataset.tab = 'tab-ai';
-    aiBtn.textContent = '🎬 E2E 시나리오 관리';
+    aiBtn.textContent = '🎬 동작 시나리오';
     aiBtn.addEventListener('click', () => switchTab('tab-ai'));
     tabsSections.appendChild(aiBtn);
 
@@ -1417,9 +1417,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       version: chrome.runtime.getManifest().version,
       exportedAt: new Date().toISOString(),
       environments: AwaEnvStore.toStorage(environments, DEFAULT_SERVERS),
-      // The arrangement of the tab bar is a setting too: it was dragged into that
-      // order on purpose, and an import without it starts over.
-      groupOrder,
+      // The arrangement of the tab bar as it stands, not only the part of it that was
+      // dragged: groupOrder is empty until something is dragged, so exporting it raw
+      // sent an empty order for a bar the user could plainly see was in one.
+      groupOrder: getGroups(),
       global: {
         autoSubmit: document.getElementById('autoSubmit').checked,
         keyDelay: parseInt(keyDelayInput.value, 10) || DEFAULT_GLOBAL.keyDelay,
@@ -1584,7 +1585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // the recorded scenarios, the granted site access. What a build ships comes back
   // on the next load, because that is what a fresh install looks like.
   document.getElementById('btn-format')?.addEventListener('click', async () => {
-    if (!confirm('저장된 모든 데이터를 지웁니다.\n\n· 서버 설정과 계정, 비밀번호, OTP Secret\n· 녹화한 E2E 시나리오\n· 허용한 사이트 접근 권한\n\n되돌릴 수 없습니다. 계속할까요?')) return;
+    if (!confirm('저장된 모든 데이터를 지웁니다.\n\n· 서버 설정과 계정, 비밀번호, OTP Secret\n· 녹화한 동작 시나리오\n· 허용한 사이트 접근 권한\n\n되돌릴 수 없습니다. 계속할까요?')) return;
     if (!confirm('마지막 확인입니다. 정말 전부 지울까요?\n필요한 설정이 있다면 먼저 📤 설정 내보내기로 저장하세요.')) return;
 
     // Taken before the configuration that names them is gone.
@@ -1599,7 +1600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   btnResetAll.addEventListener('click', async () => {
-    if (!confirm('서버 목록과 전역 설정을 배포 기본값으로 되돌립니다.\n직접 추가한 서버와 그룹은 사라집니다.\n\n녹화한 E2E 시나리오와 허용한 사이트 권한은 그대로 둡니다 — 그것까지 지우려면 전체 데이터 삭제(Format)를 쓰세요.\n\n계속하시겠습니까?')) return;
+    if (!confirm('서버 목록과 전역 설정을 배포 기본값으로 되돌립니다.\n직접 추가한 서버와 그룹은 사라집니다.\n\n녹화한 동작 시나리오와 허용한 사이트 권한은 그대로 둡니다 — 그것까지 지우려면 전체 데이터 삭제(Format)를 쓰세요.\n\n계속하시겠습니까?')) return;
 
     environments = AwaEnvStore.build({}, DEFAULT_SERVERS);
     groupOrder = [];
