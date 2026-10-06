@@ -1238,8 +1238,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // was shipped. A build that ships none — or a server someone added here — has
   // nothing to restore, so the button is not offered.
   function renderResetButton() {
+    const onServers = inServersSection(activeTabId);
+    // 현재 서버 is whichever one the 서버 설정 tab has open. On the other tabs there
+    // is no current server, so neither of these two has anything to act on.
+    if (btnDeleteServer) btnDeleteServer.style.display = onServers ? '' : 'none';
     if (!btnReset) return;
-    const group = inServersSection(activeTabId) ? activeTabId.slice(4) : '';
+    const group = onServers ? activeTabId.slice(4) : '';
     const key = selectedServerInGroup[group];
     const original = key && DEFAULT_SERVERS[key];
     btnReset.style.display = original ? '' : 'none';
