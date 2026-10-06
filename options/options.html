@@ -18,18 +18,26 @@
       </div>
     </header>
 
+    <!-- The program's sections. A server group is not one of these: it is a part of
+         the 서버 section, so it is listed inside it. -->
     <div class="tabs-nav-bar">
-      <div class="tabs-nav" id="tabs-nav">
-        <!-- Rendered dynamically -->
-      </div>
-      <button type="button" class="btn-add-options-tab" id="btn-add-env-tab" title="새 환경 탭 추가">+ 새 환경 탭 추가</button>
-      <!-- The program's own sections, kept off the row that lists servers -->
       <div class="tabs-sections" id="tabs-sections"></div>
     </div>
 
     <form id="settings-form">
-      <div id="env-tabs-content-container">
-        <!-- Environment tab contents generated dynamically -->
+      <div class="servers-box" id="servers-box">
+        <div class="servers-box-header">
+          <div class="tabs-nav" id="tabs-nav">
+            <!-- Rendered dynamically -->
+          </div>
+          <button type="button" class="btn-add-options-tab" id="btn-add-env-tab" title="새 그룹 탭 추가">+ 그룹 추가</button>
+        </div>
+        <p class="servers-empty" id="servers-empty" style="display: none;">
+          그룹이 없습니다. <strong>+ 그룹 추가</strong>로 서버를 담을 그룹을 먼저 만드세요.
+        </p>
+        <div id="env-tabs-content-container">
+          <!-- Environment tab contents generated dynamically -->
+        </div>
       </div>
 
       <!-- Static Global Settings Tab Content Panel -->
@@ -138,10 +146,17 @@
 
       <div class="actions">
         <div class="actions-left">
-          <button type="button" id="btn-reset" class="btn secondary">선택한 서버만 기본값으로 복원</button>
-          <button type="button" id="btn-reset-all" class="btn secondary">전체 초기화</button>
-          <button type="button" id="btn-delete-server" class="btn danger">현재 서버 삭제</button>
-          <button type="button" id="btn-format" class="btn danger" title="저장된 모든 데이터를 지우고 설치 직후 상태로 되돌립니다">🧨 전체 데이터 삭제 (Format)</button>
+          <!-- Puts settings back; nothing is lost that was not a setting -->
+          <div class="actions-cluster">
+            <button type="button" id="btn-reset" class="btn secondary" style="display: none;">서버를 배포 기본값으로 복원</button>
+            <button type="button" id="btn-reset-all" class="btn secondary">전체 초기화</button>
+          </div>
+          <!-- Removes things. Kept apart so neither is reached for by accident -->
+          <div class="actions-cluster danger-zone" role="group" aria-label="삭제">
+            <span class="danger-zone-label">삭제</span>
+            <button type="button" id="btn-delete-server" class="btn danger">현재 서버</button>
+            <button type="button" id="btn-format" class="btn danger" title="저장된 모든 데이터를 지우고 설치 직후 상태로 되돌립니다">🧨 전체 데이터 (Format)</button>
+          </div>
         </div>
         <div class="actions-right">
           <span id="save-status" class="save-status">✓ 설정이 성공적으로 저장되었습니다!</span>

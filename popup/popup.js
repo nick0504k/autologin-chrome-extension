@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'environments',
     'autoLoginEnabled',
     'activeGroup',
+    'groupOrder',
     'activeServerKey',
     'detectionOff',
     'detectedOwners'
@@ -84,17 +85,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   let environments = AwaEnvStore.build(stored.environments, DEFAULT_SERVERS);
 
   // Extract distinct groups
+  let groupOrder = Array.isArray(stored.groupOrder) ? stored.groupOrder : [];
+
   function getGroups() {
-    const set = new Set();
-    Object.values(environments).forEach((s) => {
-      if (s.group) set.add(s.group);
-    });
-    return Array.from(set);
+    return AwaEnvStore.groupsOf(environments, groupOrder);
   }
 
   let groups = getGroups();
   let activeGroup = stored.activeGroup && groups.includes(stored.activeGroup) ? stored.activeGroup : (groups[0] || 'DEV');
-  let activeServerKey = stored.activeServerKey && environments[stored.activeServerKey] ? stored.activeServerKey : 'dev_awa_b';
+  const firstServerOfGroup = Object.keys(environments).find((key) => environments[key].group === activeGroup);
+  let activeServerKey = stored.activeServerKey && environments[stored.activeServerKey]
+    ? stored.activeServerKey
+    : (firstServerOfGroup || Object.keys(environments)[0] || '');
   let detectedServerKey = null;
   let detectedTabHost = '';
   let detectedCertain = false;
@@ -524,32 +526,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       titleSpan.textContent = grp === 'DEV' ? '🛠️ DEV (개발)'
         : (grp === 'STG' ? '🚀 STG (스테이징)' : (grp === 'LOCAL' ? '💻 LOCAL' : `📁 ${grp}`));
       tabBtn.appendChild(titleSpan);
-
-      {
-        const btnClose = document.createElement('button');
-        btnClose.type = 'button';
-        btnClose.className = 'btn-tab-close';
-        btnClose.textContent = '✕';
-        btnClose.title = '이 탭 삭제';
-        btnClose.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          if (confirm(`'${grp}' 그룹과 포함된 서버들을 삭제하시겠습니까?`)) {
-            Object.keys(environments).forEach((k) => {
-              if (environments[k].group === grp) {
-                delete environments[k];
-              }
-            });
-            const remaining = getGroups().filter((g) => g !== grp);
-            activeGroup = remaining[0] || '';
-            activeServerKey = Object.keys(environments).find((k) => environments[k].group === activeGroup) || '';
-            await persistConfig();
-            renderCategoryTabs();
-            renderServerSwitches();
-            syncForm();
-          }
-        });
-        tabBtn.appendChild(btnClose);
-      }
 
       tabBtn.addEventListener('click', async () => {
         if (activeGroup === grp) return;

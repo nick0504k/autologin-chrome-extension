@@ -132,15 +132,54 @@ h1 {
   background-color: #f8fafc;
 }
 
-/* The program's own sections, below the row that lists servers. */
+/* The program's sections. */
 .tabs-sections {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   width: 100%;
-  margin-top: 2px;
-  padding-top: 8px;
-  border-top: 1px dashed #e2e8f0;
+}
+
+/* The 서버 설정 section. Its groups are listed at the top of it, where they belong:
+   a group is part of this section, not a sibling of it. */
+.servers-box {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 12px 14px 14px;
+  margin-bottom: 16px;
+}
+
+.servers-box-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+
+.servers-box-header .tabs-nav {
+  width: auto;
+  flex: 1 1 auto;
+  margin-bottom: -8px;
+}
+
+.servers-box-header .btn-add-options-tab {
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.servers-empty {
+  margin: 0;
+  padding: 24px 4px;
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.servers-box .tab-content.active {
+  padding: 0;
 }
 
 .tab-btn.section {
@@ -434,17 +473,58 @@ select:focus {
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid #e2e8f0;
+}
+
+/* The destructive buttons wrap when they run out of room; 저장 must not be squeezed
+   into two lines to make space for them. */
+.actions-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.actions-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* What removes data is fenced off from what only puts settings back. */
+.actions-cluster.danger-zone {
+  padding: 6px 10px 6px 12px;
+  border: 1px dashed #fca5a5;
+  border-radius: 8px;
+  background: #fef2f2;
+}
+
+.danger-zone-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #b91c1c;
+  margin-right: 2px;
 }
 
 .actions-right {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  /* Stays on the right even when the clusters on the left push it onto its own row. */
+  margin-left: auto;
+}
+
+.actions .btn {
+  white-space: nowrap;
 }
 
 .btn {
@@ -859,6 +939,21 @@ select:focus {
   justify-content: space-between;
   align-items: center;
   padding-top: 6px;
+}
+
+/* Group tabs are dragged to rearrange. */
+.servers-box-header .tab-btn[draggable='true'] {
+  cursor: grab;
+}
+
+.servers-box-header .tab-btn.dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.servers-box-header .tab-btn.drop-target {
+  box-shadow: inset 3px 0 0 #2563eb;
+  background-color: #eff6ff;
 }
 
 /* The row the popup sent the user here for. */

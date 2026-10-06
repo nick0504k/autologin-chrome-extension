@@ -66,6 +66,18 @@
     return environments;
   }
 
+  // The groups that have servers, in the order the user arranged them. The order is
+  // stored on its own: it is an arrangement of the tab bar, not a property of any
+  // server, and a group that is not in it yet simply comes last.
+  function groupsOf(environments, order) {
+    const present = [];
+    for (const server of Object.values(environments || {})) {
+      if (server?.group && !present.includes(server.group)) present.push(server.group);
+    }
+    const ranked = (Array.isArray(order) ? order : []).filter((group) => present.includes(group));
+    return [...ranked, ...present.filter((group) => !ranked.includes(group))];
+  }
+
   // Everything a tab bar and a server list put on screen. A write that leaves this
   // unchanged (a password edit, say) must not yank the page out from under the user.
   function shape(environments) {
@@ -85,5 +97,5 @@
     return payload;
   }
 
-  root.AwaEnvStore = { build, shape, envOf, toStorage, ENVIRONMENTS };
+  root.AwaEnvStore = { build, shape, envOf, groupsOf, toStorage, ENVIRONMENTS };
 })(globalThis);

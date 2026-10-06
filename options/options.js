@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'keyDelay',
     'autoSubmit',
     'activeGroup',
+    'groupOrder',
     'aiConfig'
   ]);
 
@@ -411,12 +412,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Group Management
+  let groupOrder = Array.isArray(stored.groupOrder) ? stored.groupOrder : [];
+
   function getGroups() {
-    const set = new Set();
-    Object.values(environments).forEach((s) => {
-      if (s.group) set.add(s.group);
-    });
-    return Array.from(set);
+    return AwaEnvStore.groupsOf(environments, groupOrder);
   }
 
   let groups = getGroups();
@@ -447,9 +446,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // A tab for a group this build has no servers in leaves the page with no panel
   // showing at all, which is what a build that ships none would open on.
-  if (activeTabId.startsWith('tab-') && !['tab-global', 'tab-ai'].includes(activeTabId)) {
+  if (inServersSection(activeTabId)) {
     const group = activeTabId.slice(4);
-    if (!groups.includes(group)) activeTabId = groups.length ? `tab-${groups[0]}` : 'tab-global';
+    if (!groups.includes(group)) activeTabId = groups.length ? `tab-${groups[0]}` : 'tab-servers';
   }
 
   // A server-row settings button opens this server's group and form directly.
@@ -518,7 +517,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     delete selectedServerInGroup[grp];
     saveEnvironments();
     const remaining = getGroups().filter((g) => g !== grp);
-    activeTabId = remaining.length ? `tab-${remaining[0]}` : 'tab-global';
+    activeTabId = remaining.length ? `tab-${remaining[0]}` : 'tab-servers';
     renderAllTabs();
     switchTab(activeTabId);
   }
@@ -591,6 +590,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.setAttribute('role', 'tab');
       btn.setAttribute('aria-selected', String(activeTabId === tabId));
       btn.tabIndex = 0;
+
+      // Dragged to rearrange. The order is the user's, so it is saved as its own
+      // thing rather than inferred from whatever order the servers were written in.
+      btn.draggable = true;
+      btn.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData('text/plain', grp);
+        event.dataTransfer.effectAllowed = 'move';
+        btn.classList.add('dragging');
+      });
+      btn.addEventListener('dragend', () => {
+        btn.classList.remove('dragging');
+        tabsNav.querySelectorAll('.drop-target').forEach((el) => el.classList.remove('drop-target'));
+      });
+      btn.addEventListener('dragover', (event) => {
+        if (!tabsNav.querySelector('.dragging')) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        btn.classList.add('drop-target');
+      });
+      btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
+      btn.addEventListener('drop', (event) => {
+        event.preventDefault();
+        btn.classList.remove('drop-target');
+        const moved = event.dataTransfer.getData('text/plain');
+        if (!moved || moved === grp) return;
+        const order = getGroups().filter((name) => name !== moved);
+        order.splice(order.indexOf(grp), 0, moved);
+        groupOrder = order;
+        chrome.storage.local.set({ groupOrder });
+        renderAllTabs();
+      });
+
       const label = document.createElement('span');
       label.textContent = tabLabel(grp);
       btn.appendChild(label);
@@ -816,11 +847,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       envTabsContentContainer.appendChild(panel);
     });
 
-    // The row above lists servers — data, each renameable and removable. These two are
-    // parts of the program, so they get their own row rather than reading as more
-    // servers at the end of the list.
     const tabsSections = document.getElementById('tabs-sections');
     tabsSections.replaceChildren();
+
+    // 1. The servers section. Which group is open inside it is the group tab strip's
+    // business, so this button just returns to whichever one was last open.
+    const serversBtn = document.createElement('button');
+    serversBtn.type = 'button';
+    serversBtn.className = `tab-btn section ${inServersSection(activeTabId) ? 'active' : ''}`;
+    serversBtn.dataset.tab = 'tab-servers';
+    serversBtn.textContent = '🖥️ 서버 설정';
+    serversBtn.addEventListener('click', () => {
+      const group = activeTabId.startsWith('tab-') ? activeTabId.slice(4) : '';
+      switchTab(groups.includes(group) ? activeTabId : (groups.length ? `tab-${groups[0]}` : 'tab-servers'));
+    });
+    tabsSections.appendChild(serversBtn);
 
     // 2. Global Speed Tab Nav Button
     const globalBtn = document.createElement('button');
@@ -842,6 +883,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Attach Event Listeners for Dynamic Elements
     attachTabEventListeners();
+    renderResetButton();
   }
 
   // Fetched super app customer lists, per tab, so a redraw does not refetch.
@@ -1157,11 +1199,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateOtpPreviews();
   }
 
+  // Every tab that is not one of the program's other sections is inside 서버 설정 —
+  // a group's tab, or the section itself when there are no groups yet.
+  function inServersSection(tabId) {
+    return !['tab-global', 'tab-ai'].includes(tabId);
+  }
+
+  // Restoring a server to its shipped settings only means anything for a server that
+  // was shipped. A build that ships none — or a server someone added here — has
+  // nothing to restore, so the button is not offered.
+  function renderResetButton() {
+    if (!btnReset) return;
+    const group = inServersSection(activeTabId) ? activeTabId.slice(4) : '';
+    const key = selectedServerInGroup[group];
+    const original = key && DEFAULT_SERVERS[key];
+    btnReset.style.display = original ? '' : 'none';
+    if (original) btnReset.textContent = `'${environments[key]?.name || key}' 서버를 배포 기본값으로 복원`;
+  }
+
   function switchTab(tabId) {
     activeTabId = tabId;
+    const box = document.getElementById('servers-box');
+    if (box) box.style.display = inServersSection(tabId) ? '' : 'none';
+    const empty = document.getElementById('servers-empty');
+    if (empty) empty.style.display = inServersSection(tabId) && !groups.length ? 'block' : 'none';
     refreshOtpTimer();
     document.querySelectorAll('.tab-btn').forEach((b) => {
-      b.classList.toggle('active', b.dataset.tab === tabId);
+      const isServersButton = b.dataset.tab === 'tab-servers';
+      b.classList.toggle('active', isServersButton ? inServersSection(tabId) : b.dataset.tab === tabId);
     });
     document.querySelectorAll('.tab-content').forEach((p) => {
       p.classList.toggle('active', p.id === tabId);
@@ -1169,6 +1234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (tabId === 'tab-ai') {
       renderSavedTestsList();
     }
+    renderResetButton();
   }
 
   // Add new tab/group button
@@ -1534,11 +1600,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const original = DEFAULT_SERVERS[key];
-    if (!original) {
-      reportSaveProblem(`'${current.name || key}' 서버는 직접 추가한 서버라 복원할 기본값이 없습니다.`);
-      return;
-    }
-    if (!confirm(`'${current.name || key}' 서버의 설정만 초기 기본값으로 되돌립니다. 계속하시겠습니까?`)) return;
+    if (!original) return;
+    if (!confirm(`'${current.name || key}' 서버의 설정을 배포 기본값으로 되돌립니다. 계속하시겠습니까?`)) return;
 
     environments[key] = JSON.parse(JSON.stringify(original));
     await saveEnvironments();
