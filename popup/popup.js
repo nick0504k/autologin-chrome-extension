@@ -1870,7 +1870,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? (curActiveObj ? `[${curActiveObj.group} ${curActiveObj.name}]` : '현재 서버')
         : (environments[filterMode] ? `[${environments[filterMode].group} ${environments[filterMode].name}]` : '선택된 서버');
       aiSavedList.innerHTML = `
-        <div style="text-align: center; padding: 12px; color: #94a3b8; font-size: 11px; background: #f8fafc; border-radius: 6px; border: 1px dashed #cbd5e1;">
+        <div class="pattern-suggest-empty">
           ${filterMode === 'all'
             ? '저장된 테스트가 없습니다.<br>상단에서 테스트 녹화 후 등록할 수 있습니다.'
             : `${escapeHtml(serverDesc)}에 등록된 시나리오가 없습니다.<br><span style="color: #64748b; font-size: 10px;">(상단 필터를 '🌐 모든 서버 시나리오'로 변경하거나 새 시나리오를 녹화해보세요)</span>`}

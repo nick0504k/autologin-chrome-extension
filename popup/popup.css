@@ -1038,15 +1038,6 @@ input:checked + .slider:before {
 }
 
 /* E2E Test Recorder Card & Buttons */
-.test-recorder-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
 
 .pattern-watch-toggle {
   display: flex;
@@ -1058,14 +1049,14 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 
+/* Inside a card, "nothing here yet" is a line of text. A dashed box around it is
+   a second container saying the same thing. */
 .pattern-suggest-empty {
   text-align: center;
-  padding: 10px;
+  padding: 12px 10px;
   color: #94a3b8;
   font-size: 11px;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px dashed #cbd5e1;
+  line-height: 1.5;
 }
 
 .recorder-header {
@@ -1413,9 +1404,24 @@ input:checked + .slider:before {
   background: #eff6ff;
 }
 
-/* The account controls, sitting under the server row they belong to. */
+/* The account controls, sitting under the server row they belong to. Inside the
+   list's card they are not a card of their own — the indent and the line down the
+   side are what say they belong to the row above. */
 .server-switch-list .inline-under-row {
-  margin: 2px 0 8px 10px;
+  margin: 2px 0 10px 10px;
+  padding: 8px 0 2px 12px;
+  border: none;
   border-left: 2px solid #bfdbfe;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* The record button's bar carries its own state; inside it, the live count is a
+   line of text, not a panel. */
+#record-footer .recording-live-info {
+  border: none;
+  background: transparent;
+  padding: 0 2px;
+  color: #b91c1c;
 }
