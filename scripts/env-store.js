@@ -46,6 +46,21 @@
       }
       if (!server.keypadMode) server.keypadMode = server.useVirtualKeypad === false ? 'direct' : 'virtual';
       if (server.useVirtualKeypad === undefined) server.useVirtualKeypad = server.keypadMode !== 'direct';
+      // What a mobile server's customers are picked on and listed from: shipped with
+      // the build, but kept on the server so an export carries it to an install that
+      // ships neither.
+      if (AwaServerTypes.isMobile(server)) {
+        if (!server.superAppPath && AwaDefaultServers.SUPERAPP_PATH) {
+          server.superAppPath = AwaDefaultServers.SUPERAPP_PATH;
+        }
+        if (!server.superAppListUrl && AwaDefaultServers.SUPERAPP_LIST_PATH) {
+          server.superAppListUrl = AwaDefaultServers.SUPERAPP_LIST_PATH;
+        }
+        if (!server.superAppUser && AwaDefaultServers.DEFAULT_SUPERAPP_USER) {
+          server.superAppUser = AwaDefaultServers.DEFAULT_SUPERAPP_USER;
+        }
+      }
+
       // An address pasted whole into the host field is stored split, once, here.
       const address = AwaServerUrl.resolve(server);
       server.protocol = address.protocol;

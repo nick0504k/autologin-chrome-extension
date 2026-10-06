@@ -787,7 +787,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Which page lists the customers is the site's, so it is shipped config; a
       // build without one logs in on whatever page the tab is already on.
-      const superAppPath = AwaDefaultServers.SUPERAPP_PATH;
+      const superAppPath = (cur.superAppPath || AwaDefaultServers.SUPERAPP_PATH || '').trim();
       const targetSuperAppUrl = superAppPath ? new URL(superAppPath, serverUrl).href : '';
 
       if (onTargetServer && superAppPath && tab.url && tab.url.includes(superAppPath)) {
