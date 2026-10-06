@@ -42,12 +42,9 @@
 
       <!-- Static Global Settings Tab Content Panel -->
       <div class="tab-content" id="tab-global">
-        <div class="card">
-          <h3>⚡ 전역 동작 및 가상 키패드 속도 설정</h3>
-          <p class="section-desc">모든 서버에 공통으로 적용되는 입력 동작 설정입니다.</p>
-
+        <section class="panel-section">
+          <h4 class="panel-section-title">📦 설정 이동 <span>이 설치본의 서버 설정을 파일로</span></h4>
           <div class="form-row">
-            <label>서버 설정 내보내기 / 가져오기</label>
             <p class="field-hint">서버 목록·계정·비밀번호·OTP Secret·로그인 단계를 JSON 한 파일로 옮깁니다.
               이 빌드에 기본 서버가 들어 있지 않을 때 설정을 받아오는 방법입니다.
               <strong>파일에는 비밀번호와 OTP Secret이 그대로 들어갑니다 — 비공개로 전달하세요.</strong></p>
@@ -59,8 +56,11 @@
             <p class="field-hint" id="config-io-result"></p>
           </div>
 
+        </section>
+
+        <section class="panel-section">
+          <h4 class="panel-section-title">🔐 사이트 접근 권한 <span>어느 주소에서 동작할지</span></h4>
           <div class="form-row">
-            <label>사이트 접근 권한</label>
             <p class="field-hint">확장 프로그램은 <strong>설정된 서버 주소에만</strong> 접근합니다.
               주소를 추가하거나 바꾼 뒤에는 한 번 허용해 주세요. 허용 전에는 그 주소에서 자동 로그인이 동작하지 않습니다.</p>
             <div class="host-row">
@@ -69,6 +69,10 @@
             </div>
           </div>
 
+        </section>
+
+        <section class="panel-section">
+          <h4 class="panel-section-title">⬆️ 업데이트 <span>새 설치본이 나왔는지 어디서 보는지</span></h4>
           <div class="form-row">
             <label for="updateFeedUrl">업데이트 확인 주소 (version.json)</label>
             <p class="field-hint">공개 주소여야 합니다(설치본은 비공개 유지). 비워두면 확인하지 않습니다.
@@ -86,6 +90,10 @@
             <p class="field-hint" id="update-check-result"></p>
           </div>
 
+        </section>
+
+        <section class="panel-section">
+          <h4 class="panel-section-title">⚡ 입력 동작 <span>모든 서버에 공통으로 적용됩니다</span></h4>
           <div class="form-row">
             <label class="switch-inline">
               <input type="checkbox" id="autoSubmit">
@@ -112,7 +120,7 @@
               <button type="button" class="btn-preset" data-speed="180">🛡 안정 (180ms)</button>
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
       <!-- Static E2E Scenario Management Tab -->
