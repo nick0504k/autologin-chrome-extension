@@ -95,6 +95,15 @@
           <span class="save-indicator" id="user-save-indicator">✓ 전환됨</span>
         </div>
 
+        <!-- Add New Account Form (Collapsible) — directly under the list it adds to -->
+        <div class="account-add-box" id="account-add-box" style="display: none;">
+          <input type="text" id="new-username-input" class="popup-input" placeholder="새 계정 ID 입력" spellcheck="false" autocomplete="off">
+          <div class="account-add-actions">
+            <button type="button" id="btn-confirm-add" class="btn-small primary">추가</button>
+            <button type="button" id="btn-cancel-add" class="btn-small outline">취소</button>
+          </div>
+        </div>
+
         <div class="account-password-box">
           <label id="account-password-label" for="popup-account-password">선택 ID 비밀번호</label>
           <div class="account-password-row">
@@ -102,15 +111,6 @@
             <button type="button" id="btn-save-password" class="btn-small primary">저장</button>
           </div>
           <span id="password-save-indicator" class="save-indicator" role="status">✓ 비밀번호 저장됨</span>
-        </div>
-
-        <!-- Add New Account Form (Collapsible) -->
-        <div class="account-add-box" id="account-add-box" style="display: none;">
-          <input type="text" id="new-username-input" class="popup-input" placeholder="새 계정 ID 입력" spellcheck="false" autocomplete="off">
-          <div class="account-add-actions">
-            <button type="button" id="btn-confirm-add" class="btn-small primary">추가</button>
-            <button type="button" id="btn-cancel-add" class="btn-small outline">취소</button>
-          </div>
         </div>
       </div>
 
