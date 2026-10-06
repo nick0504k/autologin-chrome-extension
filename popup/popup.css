@@ -63,6 +63,8 @@ body {
   flex: 1;
   min-width: 0;
   overflow-x: auto;
+  cursor: grab;
+  touch-action: pan-x;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
   gap: 4px;
@@ -1204,4 +1206,19 @@ input:checked + .slider:before {
   background-color: #f8fafc;
   border-top: 1px solid #e2e8f0;
   box-shadow: 0 -6px 12px rgba(15, 23, 42, 0.07);
+}
+
+#record-footer {
+  margin: 0 -12px -10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Panning the group strip: the cursor says so, and the text does not select. */
+.env-tabs.dragging {
+  cursor: grabbing;
+  user-select: none;
+  scroll-behavior: auto;
 }

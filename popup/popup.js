@@ -325,6 +325,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPermissionWarning();
   }
 
+  makeDragScrollable(envTabsContainer);
+
   function showIndicator(el) {
     if (!el) return;
     el.classList.add('show');
@@ -513,6 +515,53 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('btn-empty-open-options')?.addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
+
+  // The group strip overflows the 330px window well before four groups fit, and in a
+  // popup there is no comfortable way to scroll it sideways — no horizontal wheel on
+  // a mouse, and the scrollbar is 4px. So it is dragged: press and pan. A drag that
+  // moved is not a click, which is what keeps panning from switching groups.
+  function makeDragScrollable(strip) {
+    if (!strip || strip.dataset.dragScroll === 'on') return;
+    strip.dataset.dragScroll = 'on';
+    let startX = 0;
+    let startLeft = 0;
+    let dragging = false;
+    let moved = false;
+
+    strip.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 || strip.scrollWidth <= strip.clientWidth) return;
+      dragging = true;
+      moved = false;
+      startX = event.clientX;
+      startLeft = strip.scrollLeft;
+    });
+
+    strip.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      const delta = event.clientX - startX;
+      if (!moved && Math.abs(delta) < 4) return;
+      if (!moved) {
+        moved = true;
+        strip.classList.add('dragging');
+        strip.setPointerCapture(event.pointerId);
+      }
+      strip.scrollLeft = startLeft - delta;
+      event.preventDefault();
+    });
+
+    const end = (event) => {
+      if (!dragging) return;
+      dragging = false;
+      strip.classList.remove('dragging');
+      if (strip.hasPointerCapture?.(event.pointerId)) strip.releasePointerCapture(event.pointerId);
+      // Swallow the click the pan would otherwise finish with.
+      if (moved) strip.addEventListener('click', (e) => e.stopPropagation(), { capture: true, once: true });
+    };
+
+    strip.addEventListener('pointerup', end);
+    strip.addEventListener('pointercancel', end);
+    strip.addEventListener('dragstart', (event) => event.preventDefault());
+  }
 
   function renderCategoryTabs() {
     envTabsContainer.innerHTML = '';

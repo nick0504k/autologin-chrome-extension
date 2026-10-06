@@ -136,20 +136,6 @@
 
   <!-- Panel 2: E2E Test Recorder & One-Click Runner -->
   <div id="panel-ai-test" class="ai-test-panel" style="display: none;">
-    <!-- Recorder Card -->
-    <div class="test-recorder-card">
-
-      <button type="button" id="btn-toggle-record" class="btn-record start">
-        <span class="record-dot">🔴</span>
-        <span id="btn-record-text">동작 기록 시작 (Record)</span>
-      </button>
-
-      <div id="recording-live-info" class="recording-live-info" style="display: none;">
-        <span>🔴 실시간 기록 중:</span>
-        <span id="recording-live-count">0개 동작 감지됨</span>
-      </div>
-    </div>
-
     <div class="ai-saved-card" id="pattern-suggest-card">
       <div class="ai-saved-header">
         <span class="ai-card-title">🔁 반복 동작 제안</span>
@@ -196,6 +182,17 @@
         <span>단계 수정 및 순서 변경</span>
         <button type="button" id="btn-open-options-editor" class="btn-small outline" style="padding: 2px 7px; font-size: 10px; color: #2563eb; border-color: #bfdbfe; background: #eff6ff;">⚙️ 설정에서 편집</button>
       </div>
+    </div>
+
+    <div class="popup-footer" id="record-footer">
+      <div id="recording-live-info" class="recording-live-info" style="display: none;">
+        <span>🔴 실시간 기록 중:</span>
+        <span id="recording-live-count">0개 동작 감지됨</span>
+      </div>
+      <button type="button" id="btn-toggle-record" class="btn-record start">
+        <span class="record-dot">🔴</span>
+        <span id="btn-record-text">동작 기록 시작 (Record)</span>
+      </button>
     </div>
 
   </div>
