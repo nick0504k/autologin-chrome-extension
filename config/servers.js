@@ -4,6 +4,8 @@
 globalThis.AwaShippedServers = {
   UPDATE_DOWNLOAD_URL: "",
   SUPERAPP_PATH: "",
+  PIN_PATH: "",
+  WALLET_BUTTON_LABEL: "",
   SUPERAPP_LIST_PATH: "",
   DEFAULT_SUPERAPP_USER: "",
   NEW_SERVER: {},

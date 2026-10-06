@@ -33,6 +33,8 @@
     DEFAULT_SUPERAPP_USER: shipped.DEFAULT_SUPERAPP_USER || '',
     SUPERAPP_LIST_PATH: shipped.SUPERAPP_LIST_PATH || '',
     SUPERAPP_PATH: shipped.SUPERAPP_PATH || '',
+    PIN_PATH: shipped.PIN_PATH || '',
+    WALLET_BUTTON_LABEL: shipped.WALLET_BUTTON_LABEL || '',
     UPDATE_DOWNLOAD_URL: shipped.UPDATE_DOWNLOAD_URL || '',
     // Storage keys written by older versions, mapped to the ones in use. Ship with
     // the servers they rename, because that is what they are about.

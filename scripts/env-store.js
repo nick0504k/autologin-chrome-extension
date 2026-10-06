@@ -59,6 +59,12 @@
         if (!server.superAppUser && AwaDefaultServers.DEFAULT_SUPERAPP_USER) {
           server.superAppUser = AwaDefaultServers.DEFAULT_SUPERAPP_USER;
         }
+        if (!server.pinPath && AwaDefaultServers.PIN_PATH) {
+          server.pinPath = AwaDefaultServers.PIN_PATH;
+        }
+        if (!server.walletButtonLabel && AwaDefaultServers.WALLET_BUTTON_LABEL) {
+          server.walletButtonLabel = AwaDefaultServers.WALLET_BUTTON_LABEL;
+        }
       }
 
       // An address pasted whole into the host field is stored split, once, here.

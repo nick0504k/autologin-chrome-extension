@@ -19,6 +19,14 @@ const ADMIN_SCRIPTS = [
   'scripts/flow-runner.js',
 ];
 const MOBILE_SCRIPTS = [
+  // mobile-pin reads the server the same way everything else does, so it needs the
+  // same owners: the shipped data, the address, the type, the merge.
+  'config/servers.js',
+  'scripts/server-url.js',
+  'scripts/server-types.js',
+  'scripts/default-servers.js',
+  'scripts/env-store.js',
+  'scripts/superapp-users.js',
   'scripts/mobile-pin.js',
   'scripts/pattern-suggest.js',
   'scripts/flow-runner.js',
