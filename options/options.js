@@ -1467,10 +1467,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Wipes everything back to the shipped servers, custom tabs included.
+  // 전체 초기화 puts the settings back to what this build ships. Format is the other
+  // thing people mean by reset: leave nothing behind at all — the saved passwords,
+  // the recorded scenarios, the granted site access. What a build ships comes back
+  // on the next load, because that is what a fresh install looks like.
+  document.getElementById('btn-format')?.addEventListener('click', async () => {
+    if (!confirm('저장된 모든 데이터를 지웁니다.\n\n· 서버 설정과 계정, 비밀번호, OTP Secret\n· 녹화한 E2E 시나리오\n· 허용한 사이트 접근 권한\n\n되돌릴 수 없습니다. 계속할까요?')) return;
+    if (!confirm('마지막 확인입니다. 정말 전부 지울까요?\n필요한 설정이 있다면 먼저 📤 설정 내보내기로 저장하세요.')) return;
+
+    // Taken before the configuration that names them is gone.
+    const origins = AwaServerUrl.originPatterns(environments);
+    await chrome.storage.local.clear();
+    if (origins.length) await chrome.permissions.remove({ origins }).catch(() => {});
+    try {
+      await chrome.action.setBadgeText({ text: '' });
+    } catch (_) {}
+    alert('전체 데이터를 삭제했습니다. 설정 화면을 다시 불러옵니다.');
+    location.reload();
+  });
+
   btnResetAll.addEventListener('click', async () => {
     if (!confirm('모든 탭과 서버 설정을 초기 기본값으로 되돌립니다.\n직접 추가한 서버와 탭은 모두 사라집니다. 계속하시겠습니까?')) return;
 
     environments = AwaEnvStore.build({}, DEFAULT_SERVERS);
+    const [firstKey, firstServer] = Object.entries(environments)[0] || [];
     setSpeedValue(DEFAULT_GLOBAL.keyDelay);
     document.getElementById('autoSubmit').checked = DEFAULT_GLOBAL.autoSubmit;
     await chrome.storage.local.set({
@@ -1478,11 +1498,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       global: DEFAULT_GLOBAL,
       keyDelay: DEFAULT_GLOBAL.keyDelay,
       autoSubmit: DEFAULT_GLOBAL.autoSubmit,
-      activeGroup: 'DEV',
-      activeServerKey: 'dev_awa_b',
+      activeGroup: firstServer?.group || '',
+      activeServerKey: firstKey || '',
     });
 
-    activeTabId = 'tab-DEV';
+    activeTabId = firstServer?.group ? `tab-${firstServer.group}` : activeTabId;
     renderAllTabs();
     saveStatus.style.opacity = '1';
     saveStatus.textContent = '✓ 전체 설정을 기본값으로 초기화했습니다.';
