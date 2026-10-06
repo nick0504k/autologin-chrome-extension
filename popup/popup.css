@@ -1384,24 +1384,30 @@ input:checked + .slider:before {
   }
 }
 
-/* Rename, beside delete, in the same shape. */
+/* Rename, beside delete: the same button in a different colour, so the pair reads
+   as a pair. It was a size smaller and a shade paler, which made it look disabled. */
 .btn-icon-edit {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  background: #ffffff;
-  color: #475569;
-  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #bfdbfe;
+  border-radius: 5px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 12px;
+  line-height: 1;
   cursor: pointer;
+  transition: all 0.15s;
 }
 
 .btn-icon-edit:hover {
+  background: #2563eb;
   border-color: #2563eb;
-  color: #2563eb;
-  background: #eff6ff;
+  color: #ffffff;
 }
 
 /* The account controls, under the server row they belong to: no frame, no indent —
