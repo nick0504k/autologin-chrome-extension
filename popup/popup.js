@@ -867,8 +867,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     bar.style.display = 'flex';
   }
 
+  // openOptionsPage lands on whichever tab was open last, which is not the one the
+  // 사이트 접근 허용 button is on. Name the tab, and the row.
   document.getElementById('btn-permission-settings')?.addEventListener('click', () => {
-    chrome.runtime.openOptionsPage();
+    chrome.tabs.create({ url: chrome.runtime.getURL('options/options.html?tab=global&focus=permissions') });
   });
 
   // Newer build available? The answer is whatever the last background check wrote;

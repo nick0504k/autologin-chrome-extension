@@ -445,6 +445,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     selectedServerInGroup[grp] = inGrp[0]?.[0] || '';
   });
 
+  // A tab for a group this build has no servers in leaves the page with no panel
+  // showing at all, which is what a build that ships none would open on.
+  if (activeTabId.startsWith('tab-') && !['tab-global', 'tab-ai'].includes(activeTabId)) {
+    const group = activeTabId.slice(4);
+    if (!groups.includes(group)) activeTabId = groups.length ? `tab-${groups[0]}` : 'tab-global';
+  }
+
   // A server-row settings button opens this server's group and form directly.
   const requestedServerKey = urlParams.get('server');
   if (requestedServerKey && Object.prototype.hasOwnProperty.call(environments, requestedServerKey)) {
@@ -1565,4 +1572,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderAllTabs();
   renderPermissionState();
   switchTab(activeTabId);
+
+  // Sent here to allow a site: say which row that is, rather than leaving it to be
+  // found among everything else on the tab.
+  if (urlParams.get('focus') === 'permissions') {
+    const row = document.getElementById('permission-state')?.closest('.form-row');
+    if (row) {
+      row.scrollIntoView({ block: 'center' });
+      row.classList.add('focus-flash');
+      setTimeout(() => row.classList.remove('focus-flash'), 2600);
+    }
+    document.getElementById('btn-grant-permissions')?.focus();
+  }
 });

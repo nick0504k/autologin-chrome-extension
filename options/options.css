@@ -830,3 +830,16 @@ select:focus {
   align-items: center;
   padding-top: 6px;
 }
+
+/* The row the popup sent the user here for. */
+.form-row.focus-flash {
+  border-radius: 8px;
+  outline: 2px solid #f59e0b;
+  outline-offset: 6px;
+  animation: focus-flash-fade 2.6s ease-out forwards;
+}
+
+@keyframes focus-flash-fade {
+  0%, 60% { background: #fffbeb; }
+  100% { background: transparent; outline-color: transparent; }
+}
