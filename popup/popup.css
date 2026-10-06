@@ -1192,3 +1192,16 @@ input:checked + .slider:before {
   color: #92400e;
   line-height: 1.4;
 }
+
+/* The action the window exists for, kept on screen while the server list scrolls.
+   The negative margins undo .content's padding so the bar spans the full width. */
+.popup-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 0 -14px -12px;
+  padding: 10px 14px 12px;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -6px 12px rgba(15, 23, 42, 0.07);
+}

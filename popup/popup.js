@@ -504,7 +504,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const el = document.querySelector(selector);
       if (el) el.style.display = hasServers ? '' : 'none';
     }
-    if (btnTrigger) btnTrigger.style.display = hasServers ? '' : 'none';
+    // Hiding the button alone would leave its bar pinned to the bottom with nothing
+    // in it.
+    const footer = document.getElementById('popup-footer');
+    if (footer) footer.style.display = hasServers ? '' : 'none';
   }
 
   document.getElementById('btn-empty-open-options')?.addEventListener('click', () => {

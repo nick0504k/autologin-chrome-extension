@@ -124,9 +124,13 @@
         <div id="server-switch-list" class="server-switch-list" aria-label="서버별 자동 로그인"></div>
       </div>
 
-      <button id="btn-trigger" class="btn primary">
-        ⚡ 선택한 서버에서 로그인
-      </button>
+      <!-- Pinned: the server list scrolls past the window, and the action it leads to
+           must not scroll away with it -->
+      <div class="popup-footer" id="popup-footer">
+        <button id="btn-trigger" class="btn primary">
+          ⚡ 선택한 서버에서 로그인
+        </button>
+      </div>
     </div>
   </div>
 
