@@ -1412,3 +1412,10 @@ input:checked + .slider:before {
   color: #2563eb;
   background: #eff6ff;
 }
+
+/* The account controls, sitting under the server row they belong to. */
+.server-switch-list .inline-under-row {
+  margin: 2px 0 8px 10px;
+  border-left: 2px solid #bfdbfe;
+  border-radius: 0 8px 8px 0;
+}

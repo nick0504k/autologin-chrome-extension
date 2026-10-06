@@ -358,6 +358,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       row.append(select, state, ...(current ? [current] : []), ...(priority ? [priority] : []), label, open, settings);
       serverSwitchList.appendChild(row);
+      // The account belongs to the server above it, so it is shown there rather than
+      // in a card of its own at the top, where it named a server you had to scroll
+      // back up to see.
+      if (key === activeServerKey) {
+        for (const card of [superappCard, accountCard]) {
+          if (card) {
+            card.classList.add('inline-under-row');
+            row.after(card);
+          }
+        }
+      }
     }
     renderEmptyState();
     renderPermissionWarning();
