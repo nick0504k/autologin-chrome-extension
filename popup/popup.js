@@ -836,8 +836,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Open Options Page
+  // Each server row has its own ⚙ that opens that server's form, so the one in the
+  // header is for the settings that are not a server's: speed, update, permissions.
   btnOptions.addEventListener('click', () => {
-    chrome.runtime.openOptionsPage();
+    chrome.tabs.create({ url: chrome.runtime.getURL('options/options.html?tab=global') });
   });
 
   // =========================================================================
