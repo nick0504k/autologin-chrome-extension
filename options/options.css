@@ -535,13 +535,11 @@ select:focus {
   gap: 8px;
 }
 
-/* What removes data is fenced off from what only puts settings back. Each button
-   still says the whole thing it does — the fence is a boundary, not a shared word. */
+/* What removes data sits apart from what only puts settings back — by the gap
+   between the clusters, not by a box drawn around them. The buttons are already
+   red, and a frame here would be one more container on a page that has enough. */
 .actions-cluster.danger-zone {
-  padding: 6px 10px;
-  border: 1px dashed #fca5a5;
-  border-radius: 8px;
-  background: #fef2f2;
+  margin-left: 10px;
 }
 
 
