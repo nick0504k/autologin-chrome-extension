@@ -1295,7 +1295,20 @@ input:checked + .slider:before {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: #dc2626;
-  transition: all 0.15s;
+  transition: width 0.15s, height 0.15s, border-radius 0.15s;
+  /* Breathing while idle: a dot that only sat there read as a lamp reporting
+     something, not as a button waiting to be pressed. */
+  animation: record-idle-breathe 2s ease-in-out infinite;
+}
+
+@keyframes record-idle-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.record-mini:hover::before {
+  animation: none;
+  opacity: 1;
 }
 
 .record-mini:hover {
@@ -1312,6 +1325,10 @@ input:checked + .slider:before {
   width: 7px;
   height: 7px;
   border-radius: 1.5px;
+  /* While recording the ring pulses; the square must hold still so the two do not
+     compete. */
+  animation: none;
+  opacity: 1;
 }
 
 @keyframes record-mini-pulse {
@@ -1340,12 +1357,58 @@ input:checked + .slider:before {
   color: #f59e0b;
 }
 
-/* The status line while it is saying what just happened, rather than resting. */
-.server-switch-hint.is-notice {
-  color: #1d4ed8;
-  font-weight: 700;
-  background: #eff6ff;
+/* What a switch just did: over the window, above the pinned button, gone in a
+   few seconds. It never moves the layout, so pressing a switch does not shift the
+   row under the cursor. */
+.popup-toast {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 60px;
+  z-index: 40;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.94);
+  color: #f8fafc;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.28);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.popup-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* A user who asked for less motion gets none of it. */
+@media (prefers-reduced-motion: reduce) {
+  .record-mini::before,
+  .record-mini.recording {
+    animation: none;
+  }
+}
+
+/* Rename, beside delete, in the same shape. */
+.btn-icon-edit {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 6px 8px;
-  margin: 8px 0 6px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.btn-icon-edit:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
 }

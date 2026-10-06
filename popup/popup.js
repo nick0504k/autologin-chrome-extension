@@ -45,6 +45,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnSavePassword.addEventListener('click', saveAccountPassword);
   const btnToggleAdd = document.getElementById('btn-toggle-add');
   const btnDeleteAccount = document.getElementById('btn-delete-account');
+  const btnEditAccount = document.getElementById('btn-edit-account');
+  // The inline box does both jobs: empty it to add, fill it to rename what is there.
+  let editingAccount = null;
+
+  function showAccountButtons(server) {
+    const has = !!server?.accounts?.length;
+    btnDeleteAccount.style.display = has ? 'flex' : 'none';
+    if (btnEditAccount) btnEditAccount.style.display = has ? 'flex' : 'none';
+  }
+
+  function openAccountBox(existing) {
+    editingAccount = existing || null;
+    accountAddBox.style.display = 'flex';
+    newUsernameInput.value = existing || '';
+    newUsernameInput.placeholder = existing ? 'ID 수정' : '새 계정 ID 입력';
+    btnConfirmAdd.textContent = existing ? '저장' : '추가';
+    newUsernameInput.focus();
+    newUsernameInput.select();
+  }
+
+  function closeAccountBox() {
+    editingAccount = null;
+    accountAddBox.style.display = 'none';
+    btnConfirmAdd.textContent = '추가';
+  }
   const accountAddBox = document.getElementById('account-add-box');
   const newUsernameInput = document.getElementById('new-username-input');
   const btnConfirmAdd = document.getElementById('btn-confirm-add');
@@ -345,22 +370,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // said that something had been saved, not what it now does.
   let noticeTimer = null;
 
-  function restingStatus() {
-    return masterEnabled
-      ? '서버별로 켜고 끌 수 있습니다 · 끈 뒤 ↗로 접속하세요.'
-      : '전체 자동 로그인 꺼짐 — 서버별 설정은 그대로 있습니다.';
-  }
-
   function announce(message) {
-    const status = document.getElementById('master-status');
-    if (!status) return;
-    status.textContent = message;
-    status.classList.add('is-notice');
+    const toast = document.getElementById('popup-toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
     clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(() => {
-      status.classList.remove('is-notice');
-      status.textContent = restingStatus();
-    }, 3200);
+    noticeTimer = setTimeout(() => toast.classList.remove('show'), 3200);
   }
 
   function showIndicator(el) {
@@ -473,8 +489,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mismatched = sharesAddress && environments[detectedServerKey] !== server;
     superappNote.style.display = mismatched ? 'block' : 'none';
     if (mismatched) {
-      superappNote.textContent =
-        `이 주소는 '${AwaServerTypes.label(detected, detectedServerKey)}'로 확인되었습니다 — 아래 목록은 그 서버의 사용자입니다.`;
+      const name = AwaServerTypes.label(detected, detectedServerKey);
+      // Only a mobile server has a customer list. Saying "that server's users" when
+      // the address turned out to be an admin server named a list it does not have.
+      superappNote.textContent = AwaAccounts.isMobile(detected)
+        ? `이 주소는 '${name}'로 확인되었습니다 — 아래 목록은 그 서버의 사용자입니다.`
+        : `이 주소는 '${name}'로 확인되었습니다. 모바일 서버가 아니라 사용자 목록이 없고, 이 주소로 접속하면 그 서버의 계정으로 로그인합니다.`;
     }
   }
 
@@ -682,8 +702,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? '전체 자동 로그인: 켜짐 — 끄려면 클릭'
         : '전체 자동 로그인: 꺼짐 — 켜려면 클릭';
     }
-    const status = document.getElementById('master-status');
-    if (status && !status.classList.contains('is-notice')) status.textContent = restingStatus();
     btnTrigger.disabled = !masterEnabled || cur.enabled === false;
     popupUserSelect.innerHTML = renderAccountOptions(cur.accounts, cur.username);
     syncAccountPassword();
@@ -705,7 +723,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Account delete button visibility
-    btnDeleteAccount.style.display = !isMobile && cur.accounts && cur.accounts.length > 1 ? 'flex' : 'none';
+    showAccountButtons(isMobile ? null : cur);
   }
 
   // Master switch pauses every server without changing individual server choices.
@@ -731,17 +749,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Toggle Add Account Input
   btnToggleAdd.addEventListener('click', () => {
-    const isHidden = accountAddBox.style.display === 'none';
-    accountAddBox.style.display = isHidden ? 'flex' : 'none';
-    if (isHidden) {
-      newUsernameInput.value = '';
-      newUsernameInput.focus();
-    }
+    if (accountAddBox.style.display !== 'none' && !editingAccount) closeAccountBox();
+    else openAccountBox(null);
   });
 
-  btnCancelAdd.addEventListener('click', () => {
-    accountAddBox.style.display = 'none';
+  btnEditAccount?.addEventListener('click', () => {
+    const cur = environments[activeServerKey];
+    const target = popupUserSelect.value || cur?.username;
+    if (!target) return;
+    openAccountBox(target);
   });
+
+  btnCancelAdd.addEventListener('click', closeAccountBox);
 
   // Confirm Add Account
   btnConfirmAdd.addEventListener('click', async () => {
@@ -752,33 +771,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!cur) return;
 
     if (!Array.isArray(cur.accounts)) cur.accounts = [];
-    if (!cur.accounts.includes(val)) {
+
+    const previous = editingAccount;
+    if (previous && previous !== val) {
+      if (cur.accounts.includes(val)) {
+        alert(`'${val}' 는 이미 있는 ID입니다.`);
+        return;
+      }
+      // The password was filed under the old name; it belongs to the same account.
+      const password = AwaAccounts.getPassword(cur, previous);
+      cur.accounts = cur.accounts.map((account) => (account === previous ? val : account));
+      AwaAccounts.removePassword(cur, previous);
+      AwaAccounts.setPassword(cur, val, password);
+    } else if (!cur.accounts.includes(val)) {
       cur.accounts.push(val);
     }
     cur.username = val;
 
     await persistConfig();
-    accountAddBox.style.display = 'none';
+    announce(previous && previous !== val ? `ID를 '${previous}' → '${val}'로 바꿨습니다.` : `'${val}' 계정을 추가했습니다.`);
+    closeAccountBox();
     popupUserSelect.innerHTML = renderAccountOptions(cur.accounts, cur.username);
     syncAccountPassword();
-    btnDeleteAccount.style.display = cur.accounts.length > 1 ? 'flex' : 'none';
+    showAccountButtons(cur);
     showIndicator(userSaveIndicator);
   });
 
   // Delete Account
   btnDeleteAccount.addEventListener('click', async () => {
     const cur = environments[activeServerKey];
-    if (!cur || !Array.isArray(cur.accounts) || cur.accounts.length <= 1) return;
+    if (!cur || !cur.accounts?.length) return;
 
-    const targetUser = cur.username;
-    if (confirm(`'${targetUser}' 계정을 목록에서 삭제하시겠습니까?`)) {
+    const targetUser = cur.username || cur.accounts[0];
+    const last = cur.accounts.length === 1;
+    if (confirm(last
+      ? `'${targetUser}' 계정을 삭제하면 이 서버에 남는 ID가 없습니다. 저장된 비밀번호도 함께 지워집니다. 계속할까요?`
+      : `'${targetUser}' 계정을 목록에서 삭제하시겠습니까?`)) {
       cur.accounts = cur.accounts.filter((a) => a !== targetUser);
       AwaAccounts.removePassword(cur, targetUser);
       cur.username = cur.accounts[0] || '';
       await persistConfig();
       popupUserSelect.innerHTML = renderAccountOptions(cur.accounts, cur.username);
+      announce(cur.accounts.length
+        ? `'${targetUser}' 계정을 삭제했습니다.`
+        : `'${targetUser}' 계정을 삭제했습니다 — 이 서버에 남은 ID가 없습니다.`);
     syncAccountPassword();
-      btnDeleteAccount.style.display = cur.accounts.length > 1 ? 'flex' : 'none';
+      showAccountButtons(cur);
       showIndicator(userSaveIndicator);
     }
   });

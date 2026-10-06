@@ -20,6 +20,10 @@
     </button>
   </div>
 
+  <!-- What a switch just did. Floats over the window so it is seen wherever the
+       switch was pressed, and leaves on its own. -->
+  <div class="popup-toast" id="popup-toast" role="status" aria-live="polite"></div>
+
   <!-- Shown when a configured address has not been allowed yet -->
   <div class="permission-warning" id="permission-warning" style="display: none;">
     <span class="update-text" id="permission-text"></span>
@@ -101,6 +105,7 @@
           <select id="popup-user-select" class="popup-select">
             <!-- Populated dynamically with saved accounts -->
           </select>
+          <button type="button" id="btn-edit-account" class="btn-icon-edit" title="선택된 ID 이름 바꾸기">✎</button>
           <button type="button" id="btn-delete-account" class="btn-icon-del" title="선택된 ID 삭제">✕</button>
           <span class="save-indicator" id="user-save-indicator">✓ 전환됨</span>
         </div>
@@ -130,7 +135,6 @@
           <span class="server-label">대상 서버 선택 · 이름을 클릭하세요</span>
           <span class="save-indicator" id="server-save-indicator">✓ 전환됨</span>
         </div>
-        <p id="master-status" class="server-switch-hint" role="status">서버별 자동 로그인 · OFF로 끈 뒤 ↗로 접속하세요.</p>
         <div id="server-switch-list" class="server-switch-list" aria-label="서버별 자동 로그인"></div>
       </div>
 
