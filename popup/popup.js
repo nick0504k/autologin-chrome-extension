@@ -932,6 +932,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (mode === 'ai') {
       if (btnModeAutologin) btnModeAutologin.classList.remove('active');
       if (btnModeAi) btnModeAi.classList.add('active');
+      btnModeAutologin?.setAttribute('aria-selected', 'false');
+      btnModeAi?.setAttribute('aria-selected', 'true');
       if (panelAutologin) panelAutologin.style.display = 'none';
       if (panelAiTest) panelAiTest.style.display = 'flex';
       renderSavedTestsPopup();
@@ -939,13 +941,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       if (btnModeAutologin) btnModeAutologin.classList.add('active');
       if (btnModeAi) btnModeAi.classList.remove('active');
+      btnModeAutologin?.setAttribute('aria-selected', 'true');
+      btnModeAi?.setAttribute('aria-selected', 'false');
       if (panelAutologin) panelAutologin.style.display = 'block';
       if (panelAiTest) panelAiTest.style.display = 'none';
     }
   }
 
-  if (btnModeAutologin) btnModeAutologin.addEventListener('click', () => setPopupMode('autologin', true));
-  if (btnModeAi) btnModeAi.addEventListener('click', () => setPopupMode('ai', true));
+  // The switch inside the 자동 로그인 tab is its own control: pressing it turns auto
+  // login off without moving the panel, including from the other tab.
+  document.getElementById('master-toggle')?.addEventListener('click', (event) => event.stopPropagation());
+
+  function asTab(el, mode) {
+    if (!el) return;
+    el.addEventListener('click', () => setPopupMode(mode, true));
+    el.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      setPopupMode(mode, true);
+    });
+  }
+
+  asTab(btnModeAutologin, 'autologin');
+  asTab(btnModeAi, 'ai');
 
 
 
@@ -1233,6 +1251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // E2E Test Recorder Controller
   // ==========================================
   const btnToggleRecord = document.getElementById('btn-toggle-record');
+  const btnRecordMini = document.getElementById('btn-record-mini');
   const btnRecordText = document.getElementById('btn-record-text');
   const recorderStatusBadge = document.getElementById('recorder-status-badge');
   const recordingLiveInfo = document.getElementById('recording-live-info');
@@ -1241,6 +1260,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   let recordPollInterval = null;
 
   async function updateRecorderUI(isRecording, count = 0) {
+    if (btnRecordMini) {
+      btnRecordMini.classList.toggle('recording', !!isRecording);
+      btnRecordMini.title = isRecording ? '기록 중 — 눌러서 중지하고 저장' : '동작 기록 시작';
+    }
     if (!btnToggleRecord) return;
     if (isRecording) {
       btnToggleRecord.className = 'btn-record recording';
@@ -1300,6 +1323,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }, 1000);
+  }
+
+  // One control, two places to press it: the mini one presses the real one rather
+  // than carrying a second copy of what recording means.
+  if (btnRecordMini) {
+    btnRecordMini.addEventListener('click', (event) => {
+      event.stopPropagation();
+      btnToggleRecord?.click();
+    });
   }
 
   if (btnToggleRecord) {

@@ -588,6 +588,11 @@ input:checked + .slider:before {
 }
 
 .popup-mode-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  user-select: none;
   flex: 1;
   padding: 9px 10px;
   margin-bottom: -2px;
@@ -1223,60 +1228,28 @@ input:checked + .slider:before {
   scroll-behavior: auto;
 }
 
-/* The master switch, on the bar it governs, as one icon: lit when auto-login is on,
-   dimmed when it is off. It keeps its place when the group chips are panned. */
-.master-toggle {
+/* The master switch, inside the tab it governs — the same toggle the server rows
+   use, at the size a tab can hold. A switch reads as on/off at a glance; an icon
+   that lights up and a checkbox both needed explaining. */
+.switch-mini {
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 2px 0 6px;
-  padding-left: 8px;
-  border-left: 1px solid #e2e8f0;
-  cursor: pointer;
-}
-
-.master-toggle input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.master-toggle-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: #e2e8f0;
-  font-size: 13px;
-  line-height: 1;
-  filter: grayscale(1);
-  opacity: 0.55;
-  transition: all 0.15s;
+  height: 15px;
 }
 
-.master-toggle input:checked + .master-toggle-icon {
-  background: #2563eb;
-  filter: none;
-  opacity: 1;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+.switch-mini .slider {
+  border-radius: 15px;
 }
 
-.master-toggle:hover .master-toggle-icon {
-  background: #cbd5e1;
+.switch-mini .slider:before {
+  height: 11px;
+  width: 11px;
+  left: 2px;
+  bottom: 2px;
 }
 
-.master-toggle input:checked:hover + .master-toggle-icon,
-.master-toggle input:checked + .master-toggle-icon:hover {
-  background: #1d4ed8;
-}
-
-.master-toggle input:focus-visible + .master-toggle-icon {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
+.switch-mini input:checked + .slider:before {
+  transform: translateX(11px);
 }
 
 /* Only when there is more than fits: the last chip fades out instead of being
@@ -1290,16 +1263,59 @@ input:checked + .slider:before {
   padding-right: 2px;
 }
 
-/* Sits beside the tab it governs without stretching like the tabs do. */
-.popup-mode-bar .master-toggle {
-  align-self: center;
-  margin: 0 6px 0 2px;
-  padding: 0;
-  border-left: none;
+/* Inside the tab, as part of it. */
+.popup-mode-bar .switch-mini {
+  margin: 0;
 }
 
-.popup-mode-bar .master-toggle-icon {
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
+
+/* The record control inside the E2E tab. A hollow ring said nothing; these are the
+   two shapes every recorder has used since tape: a red dot to start, a square to
+   stop — in a ring, so it reads as a button and not as a status lamp. */
+.record-mini {
+  position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.record-mini::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #dc2626;
+  transition: all 0.15s;
+}
+
+.record-mini:hover {
+  border-color: #dc2626;
+}
+
+/* Recording: the dot becomes the stop square. */
+.record-mini.recording {
+  border-color: #dc2626;
+  animation: record-mini-pulse 1.4s ease-in-out infinite;
+}
+
+.record-mini.recording::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 1.5px;
+}
+
+@keyframes record-mini-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); }
+  50% { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0); }
+}
 }

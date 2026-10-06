@@ -34,15 +34,23 @@
 
   <!-- Popup Mode Switcher: Auto Login vs E2E Record & Run -->
   <div class="popup-mode-bar">
-    <button type="button" class="popup-mode-btn active" id="btn-mode-autologin">🔑 자동 로그인</button>
-    <!-- Beside the thing it governs, on the row that is always on screen — so it can
-         be switched off from either panel. An icon, because a slider and a label
-         would cost a tab's width. -->
-    <label class="master-toggle" id="master-toggle" title="전체 자동 로그인 켜기/끄기">
-      <input type="checkbox" id="toggle-enabled" aria-label="전체 자동 로그인">
-      <span class="master-toggle-icon" aria-hidden="true">⚡</span>
-    </label>
-    <button type="button" class="popup-mode-btn" id="btn-mode-ai">🎬 E2E 녹화 & 실행</button>
+    <!-- A tab with the switch for what it holds inside it. Not a <button>: a control
+         inside a button is neither valid nor clickable on its own, and this one has
+         to be — including from the other tab, which is why it lives on this row. -->
+    <div class="popup-mode-btn active" id="btn-mode-autologin" role="tab" tabindex="0" aria-selected="true">
+      <label class="switch switch-mini" id="master-toggle" title="전체 자동 로그인 켜기/끄기">
+        <input type="checkbox" id="toggle-enabled" aria-label="전체 자동 로그인">
+        <span class="slider"></span>
+      </label>
+      <span class="popup-mode-label">🔑 자동 로그인</span>
+    </div>
+    <div class="popup-mode-btn" id="btn-mode-ai" role="tab" tabindex="0" aria-selected="false">
+      <!-- The same idea as the switch in the tab beside it: start or stop recording
+           without leaving the panel you are on. It presses the one in the footer, so
+           there is still only one place that knows how to record. -->
+      <button type="button" class="record-mini" id="btn-record-mini" title="동작 기록 시작" aria-label="동작 기록 시작 / 중지"></button>
+      <span class="popup-mode-label">🎬 E2E 녹화 & 실행</span>
+    </div>
   </div>
 
   <!-- Panel 1: Original Auto Login (100% Preserved) -->
