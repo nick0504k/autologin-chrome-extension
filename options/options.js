@@ -637,7 +637,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnRename.type = 'button';
         btnRename.className = 'btn-tab-rename';
         btnRename.textContent = '✎';
-        btnRename.title = `'${grp}' 탭 이름 변경`;
+        btnRename.title = `'${grp}' 그룹 이름 변경`;
         btnRename.setAttribute('aria-label', btnRename.title);
         btnRename.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnClose.type = 'button';
         btnClose.className = 'btn-tab-close';
         btnClose.textContent = '✕';
-        btnClose.title = `'${grp}' 탭 삭제`;
+        btnClose.title = `'${grp}' 그룹 삭제`;
         btnClose.setAttribute('aria-label', btnClose.title);
         btnClose.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -677,12 +677,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           <section class="panel-section">
             <h4 class="panel-section-title">🖥️ 서버 <span>어느 주소를, 어느 그룹에서</span></h4>
           <div class="form-row">
-            <label for="${grp}-serverTab">소속 탭</label>
+            <label for="${grp}-serverTab">그룹 이동 <span class="label-hint">이 서버를 다른 그룹 탭으로 옮깁니다</span></label>
             <div class="tab-move-row">
               <select id="${grp}-serverTab">
                 ${groups.map((g) => `<option value="${escapeHtml(g)}" ${g === grp ? 'selected' : ''}>${escapeHtml(tabLabel(g))}</option>`).join('')}
               </select>
-              <button type="button" class="btn secondary btn-move-tab" data-group="${grp}">적용</button>
+              <button type="button" class="btn secondary btn-move-tab" data-group="${grp}">옮기기</button>
             </div>
           </div>
 
@@ -1070,7 +1070,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const target = tabSelect.value;
           if (!environments[key] || !groups.includes(target)) return;
           if (target === grp) {
-            reportSaveProblem('이미 이 탭에 있는 서버입니다.');
+            reportSaveProblem('이미 이 그룹에 있는 서버입니다.');
             return;
           }
 

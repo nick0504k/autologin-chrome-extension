@@ -1047,3 +1047,11 @@ select:focus {
   align-items: baseline;
   gap: 8px;
 }
+
+/* A field's label can carry the sentence that explains it. */
+.label-hint {
+  margin-left: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #94a3b8;
+}
