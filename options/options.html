@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자동 로그인 &amp; E2E 테스트 설정</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">⚡</div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h1>자동 로그인 &amp; E2E 테스트 설정</h1>
+          <span class="version-badge" id="app-version">v1.3.0</span>
+        </div>
+        <p class="subtitle">다중 클러스터 환경 관리, 가상 키패드 속도 및 E2E 테스트 시나리오 관리</p>
+      </div>
+    </header>
+
+    <div class="tabs-nav-bar">
+      <div class="tabs-nav" id="tabs-nav">
+        <!-- Rendered dynamically -->
+      </div>
+      <button type="button" class="btn-add-options-tab" id="btn-add-env-tab" title="새 환경 탭 추가">+ 새 환경 탭 추가</button>
+    </div>
+
+    <form id="settings-form">
+      <div id="env-tabs-content-container">
+        <!-- Environment tab contents generated dynamically -->
+      </div>
+
+      <!-- Static Global Settings Tab Content Panel -->
+      <div class="tab-content" id="tab-global">
+        <div class="card">
+          <h3>⚡ 전역 동작 및 가상 키패드 속도 설정</h3>
+          <p class="section-desc">모든 서버에 공통으로 적용되는 입력 동작 설정입니다.</p>
+
+          <div class="form-row">
+            <label>서버 설정 내보내기 / 가져오기</label>
+            <p class="field-hint">서버 목록·계정·비밀번호·OTP Secret·로그인 단계를 JSON 한 파일로 옮깁니다.
+              이 빌드에 기본 서버가 들어 있지 않을 때 설정을 받아오는 방법입니다.
+              <strong>파일에는 비밀번호와 OTP Secret이 그대로 들어갑니다 — 비공개로 전달하세요.</strong></p>
+            <div class="host-row">
+              <button type="button" class="btn secondary" id="btn-export-config">📤 설정 내보내기</button>
+              <button type="button" class="btn secondary" id="btn-import-config">📥 설정 가져오기</button>
+              <input type="file" id="input-import-config" accept="application/json,.json" style="display: none;">
+            </div>
+            <p class="field-hint" id="config-io-result"></p>
+          </div>
+
+          <div class="form-row">
+            <label>사이트 접근 권한</label>
+            <p class="field-hint">확장 프로그램은 <strong>설정된 서버 주소에만</strong> 접근합니다.
+              주소를 추가하거나 바꾼 뒤에는 한 번 허용해 주세요. 허용 전에는 그 주소에서 자동 로그인이 동작하지 않습니다.</p>
+            <div class="host-row">
+              <span class="field-hint" id="permission-state" style="margin: 0;"></span>
+              <button type="button" class="btn secondary" id="btn-grant-permissions">사이트 접근 허용</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="updateFeedUrl">업데이트 확인 주소 (version.json)</label>
+            <p class="field-hint">공개 주소여야 합니다(설치본은 비공개 유지). 비워두면 확인하지 않습니다.
+              다른 서버에 두려면 그 서버가 CORS를 허용해야 합니다.</p>
+            <input type="text" id="updateFeedUrl" placeholder="https://raw.githubusercontent.com/…/version.json" spellcheck="false">
+          </div>
+
+          <div class="form-row">
+            <label for="updateDownloadUrl">설치본 다운로드 주소 (버전 파일에 없을 때 사용)</label>
+            <p class="field-hint">비공개 저장소 링크도 됩니다. 새 탭으로 열리므로 브라우저에 로그인된 계정으로 내려받습니다.</p>
+            <div class="host-row">
+              <input type="text" id="updateDownloadUrl" placeholder="https://github.com/…/AWA_AutoLogin_Setup.bat" spellcheck="false">
+              <button type="button" class="btn secondary" id="btn-check-update">🔄 지금 확인</button>
+            </div>
+            <p class="field-hint" id="update-check-result"></p>
+          </div>
+
+          <div class="form-row">
+            <label class="switch-inline">
+              <input type="checkbox" id="autoSubmit">
+              <span>비밀번호 및 OTP 입력 후 [로그인/확인] 버튼 자동 클릭</span>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label for="keyDelay" style="margin-bottom: 0;">가상 키패드 글자 간 클릭 지연 (Speed)</label>
+              <span class="badge speed-badge" id="speed-display">120ms</span>
+            </div>
+            <p class="field-hint">20ms(초고속) ~ 300ms(안정적). 네트워크 지연이 있거나 키 누락 시 간격을 늘려주세요.</p>
+            
+            <div class="speed-control-group">
+              <input type="range" id="keyDelaySlider" min="20" max="300" step="10" value="40" class="slider-control">
+              <input type="number" id="keyDelay" min="20" max="500" step="10" value="40" class="number-control">
+            </div>
+
+            <div class="preset-buttons">
+              <button type="button" class="btn-preset" data-speed="40">⚡ 권장 (40ms)</button>
+              <button type="button" class="btn-preset" data-speed="80">🚀 빠름 (80ms)</button>
+              <button type="button" class="btn-preset" data-speed="120">⚖ 보통 (120ms)</button>
+              <button type="button" class="btn-preset" data-speed="180">🛡 안정 (180ms)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Static E2E Scenario Management Tab -->
+      <div class="tab-content" id="tab-ai">
+        <!-- Saved Tests Library Management -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h3>📁 저장된 E2E 테스트 시나리오 관리</h3>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="options-server-filter" class="options-server-select" style="padding: 4px 10px; font-size: 12px; height: 30px; border-radius: 6px;">
+                <option value="all">🌐 모든 서버 시나리오</option>
+              </select>
+              <span class="badge" id="saved-tests-count">0개</span>
+            </div>
+          </div>
+          <p class="section-desc">브라우저에서 직접 녹화하거나 저장한 E2E 테스트 시나리오 목록입니다. 원클릭으로 실행하거나 단계를 자유롭게 편집/순서 변경할 수 있습니다.</p>
+
+          <div id="saved-tests-list-container" style="margin-bottom: 16px;">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" id="btn-export-tests" class="btn secondary" style="font-size: 12px;">📤 JSON 내보내기</button>
+            <input type="file" id="input-import-tests" accept=".json" style="display: none;">
+            <button type="button" id="btn-import-tests" class="btn secondary" style="font-size: 12px;">📥 JSON 가져오기</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="actions-left">
+          <button type="button" id="btn-reset" class="btn secondary">선택한 서버만 기본값으로 복원</button>
+          <button type="button" id="btn-reset-all" class="btn secondary">전체 초기화</button>
+          <button type="button" id="btn-delete-server" class="btn danger">현재 서버 삭제</button>
+        </div>
+        <div class="actions-right">
+          <span id="save-status" class="save-status">✓ 설정이 성공적으로 저장되었습니다!</span>
+          <button type="submit" class="btn primary">모든 설정 저장</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script src="../scripts/server-types.js"></script>
+  <script src="../config/servers.js"></script>
+  <script src="../scripts/default-servers.js"></script>
+  <script src="../scripts/server-url.js"></script>
+  <script src="../scripts/env-store.js"></script>
+  <script src="../scripts/superapp-users.js"></script>
+  <script src="../scripts/server-probe.js"></script>
+  <script src="../scripts/totp.js"></script>
+  <script src="../scripts/updates.js"></script>
+  <script src="../scripts/accounts.js"></script>
+  <script src="../scripts/ai-service.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

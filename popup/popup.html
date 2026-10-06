@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자동 로그인</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="title-group">
+      <span class="icon">⚡</span>
+      <h2>자동 로그인</h2>
+      <span class="version-badge" id="app-version">v1.2.6</span>
+    </div>
+    <span class="master-switch-hint">전체</span>
+    <label class="switch" title="모든 서버 자동 로그인 켜기/끄기">
+      <input type="checkbox" id="toggle-enabled" aria-label="전체 자동 로그인">
+      <span class="slider"></span>
+    </label>
+    <button type="button" id="btn-options" class="btn-settings" title="환경별 계정 및 상세 설정" aria-label="설정">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M10 2h4l.7 2.6 1.7 1 2.6-.7 2 3.5-1.9 1.9v3.4l1.9 1.9-2 3.5-2.6-.7-1.7 1L14 22h-4l-.7-2.6-1.7-1-2.6.7-2-3.5 1.9-1.9v-3.4L3 8.4l2-3.5 2.6.7 1.7-1L10 2Z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Shown when a configured address has not been allowed yet -->
+  <div class="permission-warning" id="permission-warning" style="display: none;">
+    <span class="update-text" id="permission-text"></span>
+    <button type="button" class="btn-small primary" id="btn-permission-settings">설정에서 허용</button>
+  </div>
+
+  <!-- Shown only when the update feed reports a newer build than this one -->
+  <div class="update-notice" id="update-notice" style="display: none;">
+    <span class="update-text" id="update-text"></span>
+    <button type="button" class="btn-small primary" id="btn-update-download">설치본 받기</button>
+  </div>
+
+  <!-- Popup Mode Switcher: Auto Login vs E2E Record & Run -->
+  <div class="popup-mode-bar">
+    <button type="button" class="popup-mode-btn active" id="btn-mode-autologin">🔑 자동 로그인</button>
+    <button type="button" class="popup-mode-btn" id="btn-mode-ai">🎬 E2E 녹화 & 실행</button>
+  </div>
+
+  <!-- Panel 1: Original Auto Login (100% Preserved) -->
+  <div id="panel-autologin">
+    <!-- Dynamic Category Tabs (DEV / STG / Custom) -->
+    <div class="env-tabs-bar">
+      <div class="env-tabs" id="env-tabs-container">
+        <!-- Generated dynamically: DEV, STG, etc. -->
+      </div>
+      <button type="button" class="btn-add-tab" id="btn-add-tab" title="새 탭/그룹 추가">+</button>
+    </div>
+
+    <div class="content">
+      <!-- SuperApp / Mobile User Selection Card (Active on mobile: ID Swap dropbox) -->
+      <!-- A build that ships no servers starts here instead of on a blank panel -->
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <p class="empty-title">등록된 서버가 없습니다</p>
+        <p class="empty-text">설정에서 접속 주소와 계정을 추가하면 자동 로그인이 동작합니다.</p>
+        <button type="button" class="btn primary" id="btn-empty-open-options">⚙ 설정 열고 서버 추가</button>
+      </div>
+
+      <div class="superapp-card" id="superapp-card" style="display: none;">
+        <p class="superapp-note" id="superapp-note" style="display: none;"></p>
+        <div class="superapp-card-header">
+          <label class="superapp-label" for="superapp-user-select">📱 모바일 사용자 선택 (ID 스왑)</label>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="save-indicator" id="superapp-save-indicator">✓ 선택됨</span>
+            <button type="button" id="btn-refresh-superapp" class="btn-text-action" title="고객 목록 새로고침">↻ 새로고침</button>
+          </div>
+        </div>
+        <div class="superapp-search-wrap">
+          <input type="text" id="superapp-user-search" class="popup-input" placeholder="🔍 사용자 이름/고객번호 검색..." autocomplete="off">
+        </div>
+        <div class="superapp-select-wrap">
+          <select id="superapp-user-select" class="popup-select">
+            <option value="">(고객 목록을 불러오는 중...)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Account Selection / Swap Card (For Admin / Standard Web) -->
+      <div class="account-card" id="account-card">
+        <div class="account-card-header">
+          <label class="account-label" for="popup-user-select">계정 ID (스왑 / 선택)</label>
+          <button type="button" id="btn-toggle-add" class="btn-text-action" title="새 계정 ID 추가">+ 새 ID 추가</button>
+        </div>
+
+        <div class="account-select-wrap">
+          <select id="popup-user-select" class="popup-select">
+            <!-- Populated dynamically with saved accounts -->
+          </select>
+          <button type="button" id="btn-delete-account" class="btn-icon-del" title="선택된 ID 삭제">✕</button>
+          <span class="save-indicator" id="user-save-indicator">✓ 전환됨</span>
+        </div>
+
+        <div class="account-password-box">
+          <label id="account-password-label" for="popup-account-password">선택 ID 비밀번호</label>
+          <div class="account-password-row">
+            <input type="password" id="popup-account-password" class="popup-input" autocomplete="off" aria-describedby="password-save-indicator">
+            <button type="button" id="btn-save-password" class="btn-small primary">저장</button>
+          </div>
+          <span id="password-save-indicator" class="save-indicator" role="status">✓ 비밀번호 저장됨</span>
+        </div>
+
+        <!-- Add New Account Form (Collapsible) -->
+        <div class="account-add-box" id="account-add-box" style="display: none;">
+          <input type="text" id="new-username-input" class="popup-input" placeholder="새 계정 ID 입력" spellcheck="false" autocomplete="off">
+          <div class="account-add-actions">
+            <button type="button" id="btn-confirm-add" class="btn-small primary">추가</button>
+            <button type="button" id="btn-cancel-add" class="btn-small outline">취소</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Server List -->
+      <div class="server-card">
+        <div class="server-card-header">
+          <span class="server-label">대상 서버 선택 · 이름을 클릭하세요</span>
+          <span class="save-indicator" id="server-save-indicator">✓ 전환됨</span>
+        </div>
+        <p id="master-status" class="server-switch-hint" role="status">서버별 자동 로그인 · OFF로 끈 뒤 ↗로 접속하세요.</p>
+        <div id="server-switch-list" class="server-switch-list" aria-label="서버별 자동 로그인"></div>
+      </div>
+
+      <button id="btn-trigger" class="btn primary">
+        ⚡ 선택한 서버에서 로그인
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel 2: E2E Test Recorder & One-Click Runner -->
+  <div id="panel-ai-test" class="ai-test-panel" style="display: none;">
+    <!-- Recorder Card -->
+    <div class="test-recorder-card">
+
+      <button type="button" id="btn-toggle-record" class="btn-record start">
+        <span class="record-dot">🔴</span>
+        <span id="btn-record-text">동작 기록 시작 (Record)</span>
+      </button>
+
+      <div id="recording-live-info" class="recording-live-info" style="display: none;">
+        <span>🔴 실시간 기록 중:</span>
+        <span id="recording-live-count">0개 동작 감지됨</span>
+      </div>
+    </div>
+
+    <div class="ai-saved-card" id="pattern-suggest-card">
+      <div class="ai-saved-header">
+        <span class="ai-card-title">🔁 반복 동작 제안</span>
+        <label class="pattern-watch-toggle">
+          <input type="checkbox" id="toggle-pattern-watch" checked>
+          감지
+        </label>
+      </div>
+      <div id="pattern-suggest-list" class="ai-saved-list"></div>
+    </div>
+
+    <!-- Saved Tests Library Quick List -->
+    <div class="ai-saved-card">
+      <div class="ai-saved-header">
+        <span class="ai-card-title">📁 저장된 원클릭 테스트 목록</span>
+        <span class="badge" id="ai-saved-count">0개</span>
+      </div>
+      <div class="test-server-filter-row" style="margin-top: 6px; margin-bottom: 8px;">
+        <select id="select-test-server-filter" class="popup-input" style="font-size: 11px; padding: 3px 6px; height: 26px; border-radius: 5px; background: #ffffff; border: 1px solid #cbd5e1; width: 100%; cursor: pointer;">
+          <option value="current">📍 현재 선택된 서버 시나리오</option>
+          <option value="all">🌐 모든 서버 시나리오 보기</option>
+        </select>
+      </div>
+      <div id="ai-saved-list" class="ai-saved-list">
+        <!-- Saved tests rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Parked until a list row opens it underneath itself -->
+    <div id="ai-flow-container" class="ai-flow-card" style="display: none;">
+      <div class="ai-flow-header">
+        <strong id="ai-flow-title" class="ai-flow-title">테스트 진행 상황</strong>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span id="ai-flow-badge" class="badge">실행 중</span>
+          <button type="button" id="btn-run-preview-flow" class="btn-small primary" style="padding: 2px 8px; font-size: 10.5px; display: none;" title="이 테스트 실행하기">▶ 실행</button>
+          <button type="button" id="btn-cancel-flow" class="btn-small outline" style="color: #ef4444; border-color: #fca5a5; padding: 2px 8px; font-size: 10.5px; display: none;" title="현재 실행 중인 테스트 즉시 중단">⏹️ 중단</button>
+          <button type="button" id="btn-close-flow" class="btn-small outline" style="color: #64748b; border-color: #cbd5e1; padding: 2px 6px; font-size: 10px; display: none;" title="결과 창 닫기">✕ 닫기</button>
+        </div>
+      </div>
+      <div id="ai-steps-list" class="ai-steps-list">
+        <!-- Steps rendered here -->
+      </div>
+      <div id="ai-flow-footer-hint" style="display: none; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0; font-size: 10.5px; color: #64748b;">
+        <span>단계 수정 및 순서 변경</span>
+        <button type="button" id="btn-open-options-editor" class="btn-small outline" style="padding: 2px 7px; font-size: 10px; color: #2563eb; border-color: #bfdbfe; background: #eff6ff;">⚙️ 설정에서 편집</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../scripts/server-types.js"></script>
+  <script src="../config/servers.js"></script>
+  <script src="../scripts/default-servers.js"></script>
+  <script src="../scripts/server-url.js"></script>
+  <script src="../scripts/env-store.js"></script>
+  <script src="../scripts/superapp-users.js"></script>
+  <script src="../scripts/server-probe.js"></script>
+  <script src="../scripts/accounts.js"></script>
+  <script src="../scripts/ai-tab-automator.js"></script>
+  <script src="../scripts/ai-service.js"></script>
+  <script src="../scripts/pattern-suggest.js"></script>
+  <script src="../scripts/scenario-namer.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
