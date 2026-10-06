@@ -12,11 +12,6 @@
       <h2>자동 로그인</h2>
       <span class="version-badge" id="app-version">v1.2.6</span>
     </div>
-    <span class="master-switch-hint">전체</span>
-    <label class="switch" title="모든 서버 자동 로그인 켜기/끄기">
-      <input type="checkbox" id="toggle-enabled" aria-label="전체 자동 로그인">
-      <span class="slider"></span>
-    </label>
     <button type="button" id="btn-options" class="btn-settings" title="전역 설정 — 입력 속도, 사이트 접근 권한, 업데이트, 설정 내보내기" aria-label="전역 설정">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M10 2h4l.7 2.6 1.7 1 2.6-.7 2 3.5-1.9 1.9v3.4l1.9 1.9-2 3.5-2.6-.7-1.7 1L14 22h-4l-.7-2.6-1.7-1-2.6.7-2-3.5 1.9-1.9v-3.4L3 8.4l2-3.5 2.6.7 1.7-1L10 2Z"/>
@@ -40,6 +35,13 @@
   <!-- Popup Mode Switcher: Auto Login vs E2E Record & Run -->
   <div class="popup-mode-bar">
     <button type="button" class="popup-mode-btn active" id="btn-mode-autologin">🔑 자동 로그인</button>
+    <!-- Beside the thing it governs, on the row that is always on screen — so it can
+         be switched off from either panel. An icon, because a slider and a label
+         would cost a tab's width. -->
+    <label class="master-toggle" id="master-toggle" title="전체 자동 로그인 켜기/끄기">
+      <input type="checkbox" id="toggle-enabled" aria-label="전체 자동 로그인">
+      <span class="master-toggle-icon" aria-hidden="true">⚡</span>
+    </label>
     <button type="button" class="popup-mode-btn" id="btn-mode-ai">🎬 E2E 녹화 & 실행</button>
   </div>
 

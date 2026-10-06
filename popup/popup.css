@@ -1222,3 +1222,84 @@ input:checked + .slider:before {
   user-select: none;
   scroll-behavior: auto;
 }
+
+/* The master switch, on the bar it governs, as one icon: lit when auto-login is on,
+   dimmed when it is off. It keeps its place when the group chips are panned. */
+.master-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 2px 0 6px;
+  padding-left: 8px;
+  border-left: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+
+.master-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.master-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  font-size: 13px;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.55;
+  transition: all 0.15s;
+}
+
+.master-toggle input:checked + .master-toggle-icon {
+  background: #2563eb;
+  filter: none;
+  opacity: 1;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.master-toggle:hover .master-toggle-icon {
+  background: #cbd5e1;
+}
+
+.master-toggle input:checked:hover + .master-toggle-icon,
+.master-toggle input:checked + .master-toggle-icon:hover {
+  background: #1d4ed8;
+}
+
+.master-toggle input:focus-visible + .master-toggle-icon {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Only when there is more than fits: the last chip fades out instead of being
+   chopped, which is the difference between "scroll me" and "broken". */
+.env-tabs.is-overflowing {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent 100%);
+  mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent 100%);
+}
+
+.env-tabs {
+  padding-right: 2px;
+}
+
+/* Sits beside the tab it governs without stretching like the tabs do. */
+.popup-mode-bar .master-toggle {
+  align-self: center;
+  margin: 0 6px 0 2px;
+  padding: 0;
+  border-left: none;
+}
+
+.popup-mode-bar .master-toggle-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}

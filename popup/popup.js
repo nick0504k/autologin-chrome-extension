@@ -323,6 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     renderEmptyState();
     renderPermissionWarning();
+    markOverflow(envTabsContainer);
   }
 
   makeDragScrollable(envTabsContainer);
@@ -520,9 +521,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // popup there is no comfortable way to scroll it sideways — no horizontal wheel on
   // a mouse, and the scrollbar is 4px. So it is dragged: press and pan. A drag that
   // moved is not a click, which is what keeps panning from switching groups.
+  function markOverflow(strip) {
+    if (!strip) return;
+    strip.classList.toggle('is-overflowing', strip.scrollWidth > strip.clientWidth + 1);
+  }
+
   function makeDragScrollable(strip) {
     if (!strip || strip.dataset.dragScroll === 'on') return;
     strip.dataset.dragScroll = 'on';
+    // A chip cut off at the edge reads as broken unless the edge says there is more.
+    strip.addEventListener('scroll', () => markOverflow(strip));
+    new ResizeObserver(() => markOverflow(strip)).observe(strip);
     let startX = 0;
     let startLeft = 0;
     let dragging = false;
@@ -631,7 +640,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isMobile = AwaAccounts.isMobile(cur);
 
     toggleEnabled.checked = masterEnabled;
-    toggleEnabled.title = '모든 서버 자동 로그인 켜기/끄기';
+    // The icon has no words, so the state is in what it says on hover.
+    const masterToggle = document.getElementById('master-toggle');
+    if (masterToggle) {
+      masterToggle.title = masterEnabled
+        ? '전체 자동 로그인: 켜짐 — 끄려면 클릭'
+        : '전체 자동 로그인: 꺼짐 — 켜려면 클릭';
+    }
     document.getElementById('master-status').textContent = masterEnabled
       ? '서버별 자동 로그인 · OFF로 끈 뒤 ↗로 접속하세요.'
       : '전체 자동 로그인 OFF · 서버별 설정은 유지됩니다.';
