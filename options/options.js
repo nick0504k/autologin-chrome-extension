@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       savedTestsListContainer.innerHTML = `
         <div style="text-align: center; padding: 24px; color: #94a3b8; font-size: 13px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1;">
           ${filterVal === 'all'
-            ? '저장된 E2E 테스트 시나리오가 없습니다.<br>확장 프로그램 팝업의 [🎬 E2E 녹화 & 실행] 탭에서 [동작 기록 시작]을 통해 손쉽게 시나리오를 생성할 수 있습니다.'
+            ? '저장된 E2E 테스트 시나리오가 없습니다.<br>확장 프로그램 팝업의 [🎬 동작 녹화] 탭에서 [동작 기록 시작]을 통해 손쉽게 시나리오를 생성할 수 있습니다.'
             : '선택된 서버 환경에 매칭된 시나리오가 없습니다.<br><span style="color: #64748b; font-size: 11px;">(상단 필터를 \'🌐 모든 서버 시나리오\'로 변경하거나 새 시나리오를 녹화해보세요)</span>'}
         </div>
       `;
