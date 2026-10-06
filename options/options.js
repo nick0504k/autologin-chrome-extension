@@ -816,23 +816,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       envTabsContentContainer.appendChild(panel);
     });
 
+    // The row above lists servers — data, each renameable and removable. These two are
+    // parts of the program, so they get their own row rather than reading as more
+    // servers at the end of the list.
+    const tabsSections = document.getElementById('tabs-sections');
+    tabsSections.replaceChildren();
+
     // 2. Global Speed Tab Nav Button
     const globalBtn = document.createElement('button');
     globalBtn.type = 'button';
-    globalBtn.className = `tab-btn ${activeTabId === 'tab-global' ? 'active' : ''}`;
+    globalBtn.className = `tab-btn section ${activeTabId === 'tab-global' ? 'active' : ''}`;
     globalBtn.dataset.tab = 'tab-global';
     globalBtn.textContent = '⚡ 동작 및 속도 설정';
     globalBtn.addEventListener('click', () => switchTab('tab-global'));
-    tabsNav.appendChild(globalBtn);
+    tabsSections.appendChild(globalBtn);
 
     // 3. E2E Scenario Management Tab Nav Button
     const aiBtn = document.createElement('button');
     aiBtn.type = 'button';
-    aiBtn.className = `tab-btn ${activeTabId === 'tab-ai' ? 'active' : ''}`;
+    aiBtn.className = `tab-btn section ${activeTabId === 'tab-ai' ? 'active' : ''}`;
     aiBtn.dataset.tab = 'tab-ai';
     aiBtn.textContent = '🎬 E2E 시나리오 관리';
     aiBtn.addEventListener('click', () => switchTab('tab-ai'));
-    tabsNav.appendChild(aiBtn);
+    tabsSections.appendChild(aiBtn);
 
     // Attach Event Listeners for Dynamic Elements
     attachTabEventListeners();

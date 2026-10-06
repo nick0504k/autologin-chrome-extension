@@ -141,28 +141,7 @@ body {
   color: #dc2626;
 }
 
-.btn-add-tab {
-  background: transparent;
-  border: 1px dashed #cbd5e1;
-  color: #64748b;
-  border-radius: 5px;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1;
-  transition: all 0.15s;
-}
 
-.btn-add-tab:hover {
-  background: #e2e8f0;
-  color: #0f172a;
-  border-color: #94a3b8;
-}
 
 /* Toggle Switch */
 .switch {

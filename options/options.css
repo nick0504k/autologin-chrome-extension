@@ -132,6 +132,36 @@ h1 {
   background-color: #f8fafc;
 }
 
+/* The program's own sections, below the row that lists servers. */
+.tabs-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.tab-btn.section {
+  color: #475569;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+}
+
+.tab-btn.section:hover {
+  background-color: #e2e8f0;
+}
+
+.tab-btn.section.active {
+  color: #0f172a;
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  border-bottom-color: #2563eb;
+}
+
 .tab-btn.active {
   color: #2563eb;
   border-bottom-color: #2563eb;

@@ -11,7 +11,6 @@ function scenarioPopupChrome(name, phase) {
 document.addEventListener('DOMContentLoaded', async () => {
   const toggleEnabled = document.getElementById('toggle-enabled');
   const envTabsContainer = document.getElementById('env-tabs-container');
-  const btnAddTab = document.getElementById('btn-add-tab');
   const serverSaveIndicator = document.getElementById('server-save-indicator');
   const accountCard = document.querySelector('.account-card');
   const popupUserSelect = document.getElementById('popup-user-select');
@@ -585,15 +584,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }, { passive: false });
 
   // Render Account Options for Active Server
-  // A new server's starting account comes from the shipped config, so this file
-  // carries none. Mobile is the one family with a different default password.
-  function newServerDefaults(server) {
-    const { mobilePassword, ...base } = AwaDefaultServers.NEW_SERVER;
-    return AwaServerTypes.infer(server) === 'ewa' && mobilePassword
-      ? { ...base, password: mobilePassword }
-      : base;
-  }
-
   function renderAccountOptions(accounts, currentUsername) {
     const list = Array.isArray(accounts) && accounts.length > 0 ? accounts : (currentUsername ? [currentUsername] : []);
     // A server logged into with a personal account starts without one.
@@ -711,34 +701,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnDeleteAccount.style.display = cur.accounts.length > 1 ? 'flex' : 'none';
       showIndicator(userSaveIndicator);
     }
-  });
-
-  // Add Category Tab
-  btnAddTab.addEventListener('click', async () => {
-    const tabName = prompt('새 탭(서버 그룹) 이름을 입력하세요 (예: QA, PROD, TEST):');
-    if (!tabName) return;
-    const trimmed = tabName.trim().toUpperCase();
-    if (!trimmed) return;
-
-    activeGroup = trimmed;
-    const inGrp = Object.entries(environments).filter(([_, s]) => s.group === activeGroup);
-    if (inGrp.length === 0) {
-      const newId = `${trimmed.toLowerCase()}_server_1`;
-      environments[newId] = {
-        id: newId,
-        group: activeGroup,
-        name: `${trimmed}-1`,
-        protocol: 'https://',
-        host: '',
-        ...newServerDefaults({ name: trimmed })
-      };
-      activeServerKey = newId;
-    }
-
-    await persistConfig();
-    renderCategoryTabs();
-    renderServerSwitches();
-    syncForm();
   });
 
   // Trigger login on active tab
