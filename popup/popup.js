@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     'activeGroup',
     'groupOrder',
     'activeServerKey',
+    'serverByGroup',
     'detectionOff',
     'detectedOwners'
   ]);
@@ -119,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let groups = getGroups();
   let activeGroup = stored.activeGroup && groups.includes(stored.activeGroup) ? stored.activeGroup : (groups[0] || 'DEV');
   const firstServerOfGroup = Object.keys(environments).find((key) => environments[key].group === activeGroup);
+  const serverByGroup = { ...(stored.serverByGroup || {}) };
   let activeServerKey = stored.activeServerKey && environments[stored.activeServerKey]
     ? stored.activeServerKey
     : (firstServerOfGroup || Object.keys(environments)[0] || '');
@@ -167,13 +169,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   // out from under someone mid-edit, whoever stamped it.
   const renderedShape = (storedEnvironments) => AwaEnvStore.shape(AwaEnvStore.build(storedEnvironments, DEFAULT_SERVERS));
   function persistConfig() {
+    if (activeGroup && activeServerKey) serverByGroup[activeGroup] = activeServerKey;
     pendingConfig = pendingConfig.then(() => chrome.storage.local.set({
       environments: AwaEnvStore.toStorage(environments, DEFAULT_SERVERS),
       autoLoginEnabled: masterEnabled,
       activeGroup,
-      activeServerKey
+      activeServerKey,
+      serverByGroup
     }));
     return pendingConfig;
+  }
+
+  // Which server was last chosen in a group. Coming back to a tab should find it
+  // where it was left, not reset to whichever server happens to be first.
+  function serverFor(group) {
+    const remembered = serverByGroup[group];
+    if (remembered && environments[remembered]?.group === group) return remembered;
+    return Object.keys(environments).find((key) => environments[key].group === group) || '';
   }
 
   // The settings page writes every structural edit straight to storage. Pick those
@@ -668,10 +680,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeGroup === grp) return;
         activeGroup = grp;
 
-        const inGrp = Object.entries(environments).filter(([_, s]) => s.group === activeGroup);
-        if (inGrp.length > 0) {
-          activeServerKey = inGrp[0][0];
-        }
+        activeServerKey = serverFor(activeGroup) || activeServerKey;
 
         await persistConfig();
         renderCategoryTabs();
