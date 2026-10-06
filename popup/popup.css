@@ -1319,3 +1319,23 @@ input:checked + .slider:before {
   50% { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0); }
 }
 }
+
+/* The pick among servers that share an address: a star, not a tick — the tick sat
+   next to an on/off switch and read as "this one is on". */
+.btn-row-priority {
+  border: none;
+  background: transparent;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.btn-row-priority:hover {
+  color: #f59e0b;
+}
+
+.btn-row-priority.is-primary {
+  color: #f59e0b;
+}

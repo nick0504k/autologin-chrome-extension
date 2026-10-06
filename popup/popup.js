@@ -257,7 +257,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       state.className = 'server-switch-state';
       state.textContent = server.enabled === false ? 'OFF' : '';
       const label = document.createElement('label');
-      label.className = 'switch';
+      // The same small switch the tab uses: a row is a list item, not a control panel.
+      label.className = 'switch switch-mini';
       const toggle = document.createElement('input');
       toggle.type = 'checkbox';
       toggle.checked = server.enabled !== false;
@@ -282,8 +283,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         priority = document.createElement('button');
         priority.type = 'button';
         priority.className = `btn-row-priority${winner === key ? ' is-primary' : ''}`;
-        priority.textContent = winner === key ? '✅' : '☐';
-        priority.title = `${AwaServerUrl.origin(server)} 주소를 공유하는 서버 ${sharing.length}개 — 이 서버를 우선 적용`;
+        // A tick next to an on/off switch reads as "on", which is not what this says.
+        // A star is a pick among equals, which is what it is.
+        const isWinner = winner === key;
+        priority.textContent = isWinner ? '★' : '☆';
+        priority.title = isWinner
+          ? `이 주소(${AwaServerUrl.origin(server)})는 지금 이 서버로 로그인합니다 — 공유하는 서버 ${sharing.length}개`
+          : `이 주소(${AwaServerUrl.origin(server)})를 이 서버로 로그인하도록 지정 — 공유하는 서버 ${sharing.length}개`;
         priority.setAttribute('aria-label', priority.title);
         priority.setAttribute('aria-pressed', String(winner === key));
         priority.addEventListener('click', async () => {
