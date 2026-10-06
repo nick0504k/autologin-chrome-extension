@@ -421,6 +421,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // places — the LOCAL copies all sit on one port but each lists its own
     // deployment — so the endpoint, not the host, is what identifies a list.
     const endpoint = AwaSuperAppUsers.listUrl(server);
+    // A build that ships no list endpoint, or a server configured without one, has
+    // nowhere to ask. Saying "실패 (새로고침 필요)" sends the user to retry forever.
+    if (!endpoint) {
+      superappUserSelect.innerHTML = '<option value="">고객 목록 주소가 없습니다 — ⚙ 설정에서 지정하세요</option>';
+      return Promise.resolve();
+    }
     if (customerLoad && customerLoadKey === endpoint) return customerLoad;
     if (!force && customerLoadedKey === endpoint) {
       renderSuperAppUserDropdown(currentSuperAppCustomers, superappUserSearch?.value || '', server?.superAppUser);
@@ -438,7 +444,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       controller.abort();
       // current() also demands the request not be aborted, which this just did.
       if (version === customerLoadVersion && AwaSuperAppUsers.listUrl(environments[activeServerKey]) === endpoint) {
-        superappUserSelect.innerHTML = '<option value="">❌ 고객 목록 요청 시간 초과 (새로고침 필요)</option>';
+        superappUserSelect.innerHTML = `<option value="">❌ 응답 없음 (10초) — ${escapeHtml(endpoint)}</option>`;
       }
     }, 10000);
     const request = (async () => {
@@ -472,7 +478,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } catch (err) {
         if (!controller.signal.aborted && version === customerLoadVersion && normalizedHost(environments[activeServerKey]?.host) === host) {
-          superappUserSelect.innerHTML = '<option value="">❌ 고객 목록 로드 실패 (새로고침 필요)</option>';
+          // Which address failed and what it said. "실패 (새로고침 필요)" told the
+          // user to retry without telling anyone what to fix.
+          console.warn('[AWA] superapp customer list failed', { endpoint, error: err });
+          superappUserSelect.innerHTML =
+            `<option value="">❌ 목록 실패: ${escapeHtml(String(err?.message || err).slice(0, 60))} — ${escapeHtml(endpoint)}</option>`;
         }
       } finally {
         clearTimeout(timeout);
